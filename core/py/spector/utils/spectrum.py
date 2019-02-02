@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from .indexing import index_nearest
 
 
@@ -16,15 +18,15 @@ class Spectrum:
             return Spectrum(self.x[key], self.y[key], new_var)
         else:
             raise TypeError(f'Unsupported key {key}')
+
+    def __len__(self):
+        return len(self.x)
     
     def index(self, x):
+        if isinstance(x, Iterable):
+            return tuple([self.index(xi) for xi in x])
         if isinstance(self.x, ChannelSet):
-            i1 = int((x - self.x.start) / self.x.step)
-            i2 = i1 + 1
-            if (x - self.x[i1] < self.x[i2] - x) == self.x.step > 0:
-                return i1
-            else:
-                return i2
+            return self.x.index(x)
         return index_nearest(x, self.x)
 
 
@@ -66,3 +68,13 @@ class ChannelSet:
     
     def __len__(self):
         return self.count
+
+    def index(self, x):
+        if isinstance(x, Iterable):
+            return tuple([self.index(xi) for xi in x])
+        i1 = int((x - self.start) / self.step)
+        i2 = i1 + 1
+        if (x - self[i1] < self[i2] - x) == self.step > 0:
+            return i1
+        else:
+            return i2

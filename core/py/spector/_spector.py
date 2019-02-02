@@ -1,3 +1,4 @@
+from spector import artifact_sw
 from . import spectrum_dbs
 
 
@@ -17,7 +18,7 @@ class Result:
 class Context:
     def __init__(self):
         self.spectrum_context_list = []
-        self.artifact_context_list = []
+        self.artifact_result_list = []
 
 
 # dispatch
@@ -35,8 +36,14 @@ def process(conf: Conf, context: Context = None):
         else:
             raise RuntimeError(f"Unsupported spectrum type {type(conf)}")
         spectrum_result_list.append(spectrum_result)
-    
-    # for artifact_conf in conf.artifact_conf_list:
-    # todo process artifacts
-    
-    pass
+
+    artifact_result_list = []
+    for artifact_conf in conf.artifact_conf_list:
+        if isinstance(artifact_conf, artifact_sw.Conf):
+            spectrum_list = (spectrum_result.sp_spectrum for spectrum_result in spectrum_result_list)
+            artifact_result = artifact_sw.process(spectrum_list, artifact_conf)
+            if context is not None:
+                context.artifact_result_list.append(artifact_result)
+            artifact_result_list.append(artifact_result)
+
+    return artifact_result_list

@@ -2,7 +2,7 @@ import numpy as np
 
 # define
 from spector.utils.spectrum import Spectrum
-from spector.utils.variance import compute_sp_var
+from spector.utils.variance import spectrum_var
 
 
 class Conf:
@@ -52,7 +52,7 @@ def process(sp: Spectrum, conf: Conf):
     peak_range_i = sp.index(peak_range[0]), sp.index(peak_range[1])
     
     peak_spectrum = sp[slice(*peak_range_i)]
-    peak_spectrum.var = compute_sp_var(peak_spectrum.y)
+    peak_spectrum.var = spectrum_var(peak_spectrum.y)
     return Result(peak_center_i, peak_range_i, peak_spectrum)
 
 
