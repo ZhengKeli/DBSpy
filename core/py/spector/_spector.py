@@ -5,8 +5,9 @@ from . import spectrum_dbs
 # define
 
 class Conf:
-    def __init__(self, spectrum_conf_list, artifact_conf_list):
+    def __init__(self, spectrum_conf_list, spectrum_tag_list, artifact_conf_list):
         self.spectrum_conf_list = spectrum_conf_list
+        self.spectrum_tag_list = spectrum_tag_list
         self.artifact_conf_list = artifact_conf_list
 
 

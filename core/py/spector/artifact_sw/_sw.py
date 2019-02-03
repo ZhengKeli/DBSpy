@@ -38,7 +38,7 @@ class ResultItem:
 
 class Result:
     def __init__(self, items: Iterable[ResultItem]):
-        self.items = items
+        self.result_list = items
 
 
 # process
@@ -57,7 +57,8 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
             s_radius = conf.s_radius
         elif conf.control_s is not None:
             if control_s_radius is None:
-                control_s_radius = surround_nearest(sp.y, center_i, conf.control_s * sum_ys)
+                control_s_radius_i = surround_nearest(sp.y, center_i, conf.control_s * sum_ys)
+                control_s_radius = (sp.x[center_i + control_s_radius_i] - sp.x[center_i - control_s_radius_i]) / 2.0
             s_radius = control_s_radius
         else:
             raise TypeError("Can not define s_radius by the conf.")
@@ -68,7 +69,8 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
             w_radius = conf.w_radius
         elif conf.control_w is not None:
             if control_w_radius is None:
-                control_w_radius = surround_nearest(sp.y, center_i, (1.0 - conf.control_w) * sum_ys)
+                control_w_radius_i = surround_nearest(sp.y, center_i, (1.0 - conf.control_w) * sum_ys)
+                control_w_radius = (sp.x[center_i + control_w_radius_i] - sp.x[center_i - control_w_radius_i]) / 2.0
             w_radius = control_w_radius
         else:
             raise TypeError("Can not define w_radius by the conf.")
@@ -90,11 +92,11 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
 
 # utils
 
-def surround_nearest(ys, i, s):
-    nearest_radius, _ = search_nearest(
-        0, min(i, len(ys) - i) + 1, 1, s,
-        lambda radius: np.sum(ys[i - radius:i + radius]))
-    return nearest_radius
+def surround_nearest(ys, center_i, s):
+    nearest_radius_i, _ = search_nearest(
+        0, min(center_i, len(ys) - center_i) + 1, 1, s,
+        lambda radius_i: np.sum(ys[center_i - radius_i:center_i + radius_i]))
+    return nearest_radius_i
 
 
 def rate_var(ys, ys_var, head, tail):
