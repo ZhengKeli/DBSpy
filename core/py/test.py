@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 import spector
 
@@ -75,10 +76,14 @@ for artifact_result in context.artifact_result_list:
     if isinstance(artifact_result, spector.artifact_sw.Result):
         print("s curve")
         s_list = tuple([sw_result.s for sw_result in artifact_result.result_list])
-        plt.plot(conf.spectrum_tag_list, s_list)
+        s_var_list = tuple([sw_result.s_var for sw_result in artifact_result.result_list])
+        # plt.plot(conf.spectrum_tag_list, s_list)
+        plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
         plt.show()
         
         print("w curve")
         w_list = tuple([sw_result.w for sw_result in artifact_result.result_list])
-        plt.plot(conf.spectrum_tag_list, w_list)
+        w_var_list = tuple([sw_result.w_var for sw_result in artifact_result.result_list])
+        # plt.plot(conf.spectrum_tag_list, w_list)
+        plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         plt.show()
