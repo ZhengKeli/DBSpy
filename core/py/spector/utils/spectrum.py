@@ -11,14 +11,12 @@ class Spectrum:
         self.slice = 0
     
     def __getitem__(self, key):
-        if isinstance(key, int):
-            return SpectrumPoint(self, key)
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             new_var = None if self.var is None else self.var[key]
             return Spectrum(self.x[key], self.y[key], new_var)
         else:
-            raise TypeError(f'Unsupported key {key}')
-
+            return SpectrumPoint(self, key)
+    
     def __len__(self):
         return len(self.x)
     
@@ -58,13 +56,13 @@ class ChannelSet:
         self.count = count
     
     def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.start + self.step * key
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             slice_start = 0 if key.start is None else key.start
             slice_stop = self.count if key.start is None else key.stop
             slice_step = 1 if key.step is None else key.step
             return ChannelSet(self[slice_start], self.step * slice_step, int((slice_stop - slice_start) / slice_step))
+        else:
+            return self.start + self.step * key
     
     def __len__(self):
         return self.count

@@ -10,9 +10,10 @@ from spector.utils.variance import add_var, sum_var, divide_var
 # define
 
 class Conf:
-    def __init__(self, s_radius=None, w_radius=None, control_s=None, control_w=None):
+    def __init__(self, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
         self.s_radius = s_radius
         self.w_radius = w_radius
+        self.control_id = control_id
         self.control_s = control_s
         self.control_w = control_w
 

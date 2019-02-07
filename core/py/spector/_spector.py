@@ -1,4 +1,4 @@
-from spector import artifact_sw
+from spector import artifact_sw, artifact_ratio
 from . import spectrum_dbs
 
 
@@ -35,16 +35,20 @@ def process(conf: Conf, context: Context = None):
             else:
                 spectrum_result = spectrum_dbs.process(spectrum_conf)
         else:
-            raise RuntimeError(f"Unsupported spectrum type {type(conf)}")
+            raise TypeError(f"Unsupported spectrum_conf {spectrum_conf}")
         spectrum_result_list.append(spectrum_result)
 
     artifact_result_list = []
     for artifact_conf in conf.artifact_conf_list:
+        spectrum_list = tuple(spectrum_result.sp_spectrum for spectrum_result in spectrum_result_list)
         if isinstance(artifact_conf, artifact_sw.Conf):
-            spectrum_list = (spectrum_result.sp_spectrum for spectrum_result in spectrum_result_list)
             artifact_result = artifact_sw.process(spectrum_list, artifact_conf)
-            if context is not None:
-                context.artifact_result_list.append(artifact_result)
-            artifact_result_list.append(artifact_result)
-
+        elif isinstance(artifact_conf, artifact_ratio.Conf):
+            artifact_result = artifact_ratio.process(spectrum_list, artifact_conf)
+        else:
+            raise TypeError(f"Unsupported artifact_conf {artifact_conf}")
+        if context is not None:
+            context.artifact_result_list.append(artifact_result)
+        artifact_result_list.append(artifact_result)
+    
     return artifact_result_list

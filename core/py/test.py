@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
 import spector
 
@@ -21,18 +20,22 @@ conf = spector.Conf(
             bg_expand=1
         )
     ) for file_path in [
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/0 ppm__1_150218/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/80 ppm_#4_150515/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/150 ppm_#5_150515_1/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/230 ppm_#8_150516/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/310 ppm_#9_150516_1/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/ZKL/Develop/Projects/PositronSpector/core/data/610 ppm_#6_150519/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/0 ppm__1_150218/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/80 ppm_#4_150515/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/150 ppm_#5_150515_1/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/230 ppm_#8_150516/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/310 ppm_#9_150516_1/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/610 ppm_#6_150519/energy_smoothed.txt",
     ]],
     spectrum_tag_list=[0, 80, 150, 230, 310, 610],
     artifact_conf_list=[
         spector.artifact_sw.Conf(
             control_s=0.5,
             control_w=0.03
+        ),
+        spector.artifact_ratio.Conf(
+            fold_mode='fold',
+            compare_mode='subtract'
         )
     ]
 )
@@ -78,12 +81,18 @@ for artifact_result in context.artifact_result_list:
         s_list = tuple([sw_result.s for sw_result in artifact_result.result_list])
         s_var_list = tuple([sw_result.s_var for sw_result in artifact_result.result_list])
         # plt.plot(conf.spectrum_tag_list, s_list)
-        plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
-        plt.show()
+        # plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
+        # plt.show()
         
         print("w curve")
         w_list = tuple([sw_result.w for sw_result in artifact_result.result_list])
         w_var_list = tuple([sw_result.w_var for sw_result in artifact_result.result_list])
         # plt.plot(conf.spectrum_tag_list, w_list)
-        plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
+        # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
+        # plt.show()
+    elif isinstance(artifact_result, spector.artifact_ratio.Result):
+        print("ratio curves")
+        for ratio in artifact_result.ratio_list:
+            plt.plot(range(len(ratio)), -ratio)
+        plt.legend(conf.spectrum_tag_list)
         plt.show()
