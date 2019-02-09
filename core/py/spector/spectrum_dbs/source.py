@@ -5,7 +5,6 @@ from spector.utils.spectrum import Spectrum
 
 # define
 
-
 class Conf:
     def __init__(self, file_path=None, file_type=None):
         self.file_path = file_path

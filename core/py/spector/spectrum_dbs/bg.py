@@ -5,7 +5,6 @@ from spector.utils.spectrum import Spectrum
 
 # define
 
-
 class Conf:
     def __init__(self, bg_radius=None, bg_range=None, bg_expand=None, bg_algorithm=None):
         self.radius = bg_radius

@@ -20,12 +20,14 @@ conf = spector.Conf(
             bg_expand=1
         )
     ) for file_path in [
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/0 ppm__1_150218/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/80 ppm_#4_150515/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/150 ppm_#5_150515_1/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/230 ppm_#8_150516/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/310 ppm_#9_150516_1/energy_smoothed.txt",
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/610 ppm_#6_150519/energy_smoothed.txt",
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/" + name + "/energy_smoothed.txt"
+        for name in [
+            "0 ppm__1_150218",
+            "80 ppm_#4_150515",
+            "150 ppm_#5_150515_1",
+            "230 ppm_#8_150516",
+            "310 ppm_#9_150516_1",
+            "610 ppm_#6_150519"]
     ]],
     spectrum_tag_list=[0, 80, 150, 230, 310, 610],
     artifact_conf_list=[

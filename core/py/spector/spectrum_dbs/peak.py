@@ -1,9 +1,10 @@
 import numpy as np
 
-# define
 from spector.utils.spectrum import Spectrum
 from spector.utils.variance import spectrum_var
 
+
+# define
 
 class Conf:
     def __init__(self, search_center=None, search_radius=None, search_range=None,
