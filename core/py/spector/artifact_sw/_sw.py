@@ -2,8 +2,8 @@ from typing import Iterable
 
 import numpy as np
 
+from spector.utils.Spectrum import Spectrum
 from spector.utils.indexing import search_nearest
-from spector.utils.spectrum import Spectrum
 from spector.utils.variance import add_var, sum_var, divide_var
 
 

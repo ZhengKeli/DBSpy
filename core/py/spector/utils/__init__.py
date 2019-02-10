@@ -1,1 +1,1 @@
-from . import indexing, gaussian, spectrum, variance
+from . import indexing, gaussian, Spectrum, variance

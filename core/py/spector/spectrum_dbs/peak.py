@@ -1,6 +1,6 @@
 import numpy as np
 
-from spector.utils.spectrum import Spectrum
+from spector.utils.Spectrum import Spectrum
 from spector.utils.variance import spectrum_var
 
 

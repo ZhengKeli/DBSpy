@@ -1,7 +1,7 @@
 import numpy as np
 
+from spector.utils.Spectrum import Spectrum
 from spector.utils.gaussian import gaussian_fwhm, gaussian_fit
-from spector.utils.spectrum import Spectrum
 from .peak import Conf
 from .peak import process as peak_process
 

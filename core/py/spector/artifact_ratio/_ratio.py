@@ -1,9 +1,10 @@
 import numpy as np
 
-# define
-from spector.utils.spectrum import Spectrum
+from spector.utils.Spectrum import Spectrum
 from spector.utils.variance import add_var, minus_var, divide_var
 
+
+# define
 
 class Conf:
     def __init__(self, fold_mode: str = None, compare_mode: str = None):
@@ -22,19 +23,9 @@ class Result:
 def process(sp_list, conf: Conf):
     sp_list, center_i = align_peak(sp_list)
     sp_fold_list = fold_sp(sp_list, center_i, conf.fold_mode)
-    
-    control_sp = sp_fold_list[0]
-    ratio_list = []
-    ratio_var_list = []
-    for sp_fold in sp_fold_list:
-        if conf.compare_mode == 'subtract' or conf.compare_mode is None:
-            ratio, ratio_var = minus_var(sp_fold.y, sp_fold.var, control_sp.y, control_sp.var)
-        elif conf.compare_mode == 'divide':
-            ratio, ratio_var = divide_var(sp_fold.y, sp_fold.var, control_sp.y, control_sp.var)
-        else:
-            raise TypeError(f"Unsupported compare mode {conf.compare_mode}")
-        ratio_list.append(ratio)
-        ratio_var_list.append(ratio_var)
+    ys_list = tuple(sp_fold.y for sp_fold in sp_fold_list)
+    ys_var_list = tuple(sp_fold.var for sp_fold in sp_fold_list)
+    ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
     return Result(ratio_list, ratio_var_list)
 
 
@@ -68,9 +59,34 @@ def fold_sp(sp_list, center_i, mode):
             sp_left = sp_left_list[i][:len_min]
             sp_right = sp_right_list[i][:len_min]
             ys, ys_var = add_var(np.flip(sp_left.y, 0), np.flip(sp_left.var, 0), sp_right.y, sp_right.var)
-            ys = ys / 2
-            ys_var = ys_var / 2
             fold_list.append(Spectrum(sp_right.x, ys, ys_var))
         return fold_list
     else:
         raise TypeError("Unsupported fold mode")
+
+
+def compute_ratio(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
+    scale_list = tuple(np.sum(ys) for ys in ys_list)
+    ys_list = tuple(ys_list[i] / scale_list[i] for i in range(len(ys_list)))
+    ys_var_list = tuple(ys_var_list[i] / np.square(scale_list[i]) for i in range(len(ys_var_list)))
+    
+    if control_ys is None:
+        control_ys = ys_list[0]
+    
+    if control_ys_var is None:
+        control_ys_var = ys_var_list[0]
+    
+    ratio_list = []
+    ratio_var_list = []
+    for i in range(len(ys_list)):
+        ys = ys_list[i]
+        ys_var = ys_var_list[i]
+        if compare_mode == 'subtract' or compare_mode is None:
+            ratio, ratio_var = minus_var(ys, ys_var, control_ys, control_ys_var)
+        elif compare_mode == 'divide':
+            ratio, ratio_var = divide_var(ys, ys_var, control_ys, control_ys_var)
+        else:
+            raise TypeError(f"Unsupported compare mode {compare_mode}")
+        ratio_list.append(ratio)
+        ratio_var_list.append(ratio_var)
+    return ratio_list, ratio_var_list
