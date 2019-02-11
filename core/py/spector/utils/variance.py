@@ -1,12 +1,6 @@
 import numpy as np
 
 
-def spectrum_var(ys, ys_sum=None):
-    if ys_sum is None:
-        ys_sum = np.sum(ys)
-    return ys * (1 - ys / ys_sum)
-
-
 def add_var(x1, x1_var, x2, x2_var):
     y = x1 + x2
     y_var = x1_var + x2_var

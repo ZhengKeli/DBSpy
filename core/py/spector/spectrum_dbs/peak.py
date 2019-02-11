@@ -1,7 +1,6 @@
 import numpy as np
 
 from spector.utils.Spectrum import Spectrum
-from spector.utils.variance import spectrum_var
 
 
 # define
@@ -58,6 +57,12 @@ def process(sp: Spectrum, conf: Conf):
 
 
 # utils
+
+def spectrum_var(ys, ys_sum=None):
+    if ys_sum is None:
+        ys_sum = np.sum(ys)
+    return ys * (1 - ys / ys_sum)
+
 
 def search_peak_center_i(ys, search_head_i, search_tail_i):
     search_ys = ys[search_head_i:search_tail_i]
