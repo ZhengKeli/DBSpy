@@ -36,7 +36,5 @@ def process(conf: Conf) -> Result:
 
 def load_dbs_spectrum_from_txt(file_path) -> Spectrum:
     m = np.loadtxt(file_path)
-    xs = m[:, 0]
-    ys = m[:, 1]
-    # channels = ChannelSet(xs[0], xs[1] - xs[0], len(xs))
+    xs, ys = m[:, 0], m[:, 1]
     return Spectrum(xs, ys)
