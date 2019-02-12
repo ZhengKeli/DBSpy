@@ -13,9 +13,8 @@ class Conf:
 
 
 class Result:
-    def __init__(self, ratio_list, ratio_var_list):
-        self.ratio_list = ratio_list
-        self.ratio_var_list = ratio_var_list
+    def __init__(self, ratio_sp_list):
+        self.ratio_sp_list = ratio_sp_list
 
 
 # process
@@ -26,7 +25,8 @@ def process(sp_list, conf: Conf):
     ys_list = tuple(sp_fold.y for sp_fold in sp_fold_list)
     ys_var_list = tuple(sp_fold.var for sp_fold in sp_fold_list)
     ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
-    return Result(ratio_list, ratio_var_list)
+    ratio_sp_list = tuple(Spectrum(sp_fold_list[i].x, ratio_list[i], ratio_var_list[i]) for i in range(len(sp_list)))
+    return Result(ratio_sp_list)
 
 
 # utils
@@ -47,9 +47,21 @@ def fold_sp(sp_list, center_i, mode):
     if mode == 'none' or mode is None:
         return sp_list
     elif mode == 'left':
-        return tuple(sp[:center_i + 1] for sp in sp_list)
+        left_list = []
+        for sp in sp_list:
+            center = sp.x[center_i]
+            left_sp = sp[:center_i + 1]
+            left_sp = Spectrum(np.flip(center - left_sp.x), np.flip(left_sp.y), np.flip(left_sp.var))
+            left_list.append(left_sp)
+        return left_list
     elif mode == 'right':
-        return tuple(sp[center_i:] for sp in sp_list)
+        left_list = []
+        for sp in sp_list:
+            center = sp.x[center_i]
+            left_sp = sp[center_i:]
+            left_sp = Spectrum(left_sp.x - center, left_sp.y, left_sp.var)
+            left_list.append(left_sp)
+        return left_list
     elif mode == 'fold':
         sp_left_list = fold_sp(sp_list, center_i, 'left')
         sp_right_list = fold_sp(sp_list, center_i, 'right')
@@ -58,7 +70,7 @@ def fold_sp(sp_list, center_i, mode):
         for i in range(len(sp_list)):
             sp_left = sp_left_list[i][:len_min]
             sp_right = sp_right_list[i][:len_min]
-            ys, ys_var = add_var(np.flip(sp_left.y, 0), np.flip(sp_left.var, 0), sp_right.y, sp_right.var)
+            ys, ys_var = add_var(sp_left.y, sp_left.var, sp_right.y, sp_right.var)
             fold_list.append(Spectrum(sp_right.x, ys, ys_var))
         return fold_list
     else:

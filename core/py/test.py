@@ -36,7 +36,7 @@ conf = spector.Conf(
             control_w=0.03
         ),
         spector.artifact_ratio.Conf(
-            fold_mode='right',
+            fold_mode='fold',
             compare_mode='subtract'
         )
     ]
@@ -94,7 +94,8 @@ for artifact_result in context.artifact_result_list:
         # plt.show()
     elif isinstance(artifact_result, spector.artifact_ratio.Result):
         print("ratio curves")
-        for ratio in artifact_result.ratio_list:
-            plt.plot(range(len(ratio)), ratio)
+        for ratio_sp in artifact_result.ratio_sp_list:
+            # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
+            plt.plot(ratio_sp.x, ratio_sp.y)
         plt.legend(conf.spectrum_tag_list)
         plt.show()
