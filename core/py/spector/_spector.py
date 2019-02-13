@@ -1,5 +1,6 @@
 from spector import artifact_sw, artifact_ratio
 from . import spectrum_dbs
+from .utils import ProcessBlock
 
 
 # define
@@ -16,39 +17,32 @@ class Result:
         self.artifacts_list = artifact_list
 
 
-class Context:
-    def __init__(self):
-        self.spectrum_context_list = []
-        self.artifact_result_list = []
-
-
-# dispatch
-
-def process(conf: Conf, context: Context = None):
-    spectrum_result_list = []
-    for spectrum_conf in conf.spectrum_conf_list:
-        if isinstance(spectrum_conf, spectrum_dbs.Conf):
-            if context is not None:
-                spectrum_context = spectrum_dbs.Context()
-                context.spectrum_context_list.append(spectrum_context)
-                spectrum_result = spectrum_dbs.process(spectrum_conf, spectrum_context)
-            else:
-                spectrum_result = spectrum_dbs.process(spectrum_conf)
-        else:
-            raise TypeError(f"Unsupported spectrum_conf {spectrum_conf}")
-        spectrum_result_list.append(spectrum_result)
-
-    artifact_result_list = []
-    for artifact_conf in conf.artifact_conf_list:
-        spectrum_list = tuple(spectrum_result.sp_spectrum for spectrum_result in spectrum_result_list)
-        if isinstance(artifact_conf, artifact_sw.Conf):
-            artifact_result = artifact_sw.process(spectrum_list, artifact_conf)
-        elif isinstance(artifact_conf, artifact_ratio.Conf):
-            artifact_result = artifact_ratio.process(spectrum_list, artifact_conf)
-        else:
-            raise TypeError(f"Unsupported artifact_conf {artifact_conf}")
-        if context is not None:
-            context.artifact_result_list.append(artifact_result)
-        artifact_result_list.append(artifact_result)
+class SpectorBlock(ProcessBlock):
     
-    return artifact_result_list
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+        
+        self.spectrum_blocks = []
+        for spectrum_conf in conf.spectrum_conf_list:
+            if isinstance(spectrum_conf, spectrum_dbs.Conf):
+                self.spectrum_blocks.append(spectrum_dbs.DBSBlock(spectrum_conf))
+            else:
+                raise TypeError(f"Unsupported spectrum_conf {spectrum_conf}")
+        
+        self.artifact_blocks = []
+        for artifact_conf in conf.artifact_conf_list:
+            if isinstance(artifact_conf, artifact_sw.Conf):
+                self.artifact_blocks.append(artifact_sw.SWBlock(artifact_conf))
+            elif isinstance(artifact_conf, artifact_ratio.Conf):
+                self.artifact_blocks.append(artifact_ratio.RatioBlock(artifact_conf))
+            else:
+                raise TypeError(f"Unsupported artifact_conf {artifact_conf}")
+    
+    def on_process(self):
+        spectrum_result_list = tuple(spectrum_block.process() for spectrum_block in self.spectrum_blocks)
+        spectrum_list = tuple(spectrum_result.sp_spectrum for spectrum_result in spectrum_result_list)
+        
+        artifact_result_list = tuple(artifact_block.process(spectrum_list) for artifact_block in self.artifact_blocks)
+        
+        return Result(artifact_result_list)

@@ -1,5 +1,8 @@
+from typing import Iterable
+
 import numpy as np
 
+from spector.utils import ProcessBlock
 from spector.utils.Spectrum import Spectrum
 from spector.utils.variance import add_var, minus_var, divide_var
 
@@ -17,9 +20,19 @@ class Result:
         self.ratio_sp_list = ratio_sp_list
 
 
+class RatioBlock(ProcessBlock):
+    
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+    
+    def on_process(self, sp_list: Iterable[Spectrum]):
+        return process(sp_list, self.conf)
+
+
 # process
 
-def process(sp_list, conf: Conf):
+def process(sp_list: Iterable[Spectrum], conf: Conf):
     sp_list, center_i = align_peak(sp_list)
     sp_fold_list = fold_sp(sp_list, center_i, conf.fold_mode)
     ys_list = tuple(sp_fold.y for sp_fold in sp_fold_list)

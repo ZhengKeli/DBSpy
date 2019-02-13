@@ -2,6 +2,7 @@ from typing import Iterable
 
 import numpy as np
 
+from spector.utils import ProcessBlock
 from spector.utils.Spectrum import Spectrum
 from spector.utils.indexing import search_nearest
 from spector.utils.variance import add_var, sum_var, divide_var
@@ -39,7 +40,17 @@ class ResultItem:
 
 class Result:
     def __init__(self, items: Iterable[ResultItem]):
-        self.result_list = items
+        self.items = items
+
+
+class SWBlock(ProcessBlock):
+    
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+    
+    def on_process(self, sp_list: Iterable[Spectrum]):
+        return process(sp_list, self.conf)
 
 
 # process
@@ -82,12 +93,12 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
         w1, w1_var = rate_var(sp.y, sp.var, None, w_range_i[0])
         w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], None)
         w, w_var = add_var(w1, w1_var, w2, w2_var)
-        result = ResultItem(
+        result_item = ResultItem(
             s, s_var, s_range_i,
             w, w_var, w_range_i,
             w1, w1_var, (0, w_range_i[0]),
             w2, w2_var, (w_range_i[0], len(sp)))
-        result_list.append(result)
+        result_list.append(result_item)
     return Result(result_list)
 
 

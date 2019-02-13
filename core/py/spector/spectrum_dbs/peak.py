@@ -1,13 +1,13 @@
 import numpy as np
 
+from spector.utils import ProcessBlock
 from spector.utils.Spectrum import Spectrum
 
 
 # define
 
 class Conf:
-    def __init__(self, search_center=None, search_radius=None, search_range=None,
-                 peak_center=None, peak_radius=None):
+    def __init__(self, search_center=None, search_radius=None, search_range=None, peak_center=None, peak_radius=None):
         self.search_center = search_center
         self.search_radius = search_radius
         self.search_range = search_range
@@ -20,6 +20,16 @@ class Result:
         self.peak_center_i = peak_center_i
         self.peak_range_i = peak_range_i
         self.peak_spectrum = peak_spectrum
+
+
+class PeakBlock(ProcessBlock):
+    
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+    
+    def on_process(self, sp: Spectrum):
+        return process(sp, self.conf)
 
 
 # process

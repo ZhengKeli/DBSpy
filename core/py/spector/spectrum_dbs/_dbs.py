@@ -1,17 +1,18 @@
 import numpy as np
 
-from spector.utils.Spectrum import Spectrum
-from . import bg, peak, source, res
+from spector.utils import ProcessBlock
+from spector.utils import Spectrum
+from . import bg, peak, raw, res
 
 
 # define
 
 class Conf:
-    def __init__(self, source_conf: source.Conf, peak_conf: peak.Conf, bg_conf: bg.Conf, res_conf: res.Conf = None):
-        self.source_conf = source_conf
-        self.res_conf = res_conf
+    def __init__(self, raw_conf: raw.Conf, peak_conf: peak.Conf, bg_conf: bg.Conf, res_conf: res.Conf = None):
+        self.raw_conf = raw_conf
         self.peak_conf = peak_conf
         self.bg_conf = bg_conf
+        self.res_conf = res_conf
 
 
 class Result:
@@ -21,51 +22,39 @@ class Result:
         self.sp_resolution = sp_resolution
 
 
-class Context:
-    def __init__(self):
-        self.source_result: source.Result = None
-        self.res_result: res.Result = None
-        self.peak_result: peak.Result = None
-        self.bg_result: bg.Result = None
-        self.sp_result: Result = None
-
-
-# process
-
-def process(conf: Conf, context: Context = None) -> Result:
-    source_result = source.process(conf.source_conf)
-    raw_spectrum = source_result.raw_spectrum
-    if context is not None:
-        context.source_result = source_result
+class DBSBlock(ProcessBlock):
     
-    if conf.res_conf is not None:
-        res_result = res.process(raw_spectrum, conf.res_conf)
-        resolution = res_result.resolution
-        if context is not None:
-            context.res_result = res_result
-    else:
-        resolution = None
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+        self.raw_block = raw.RawBlock(conf.raw_conf)
+        self.peak_block = peak.PeakBlock(conf.peak_conf)
+        self.bg_block = bg.BgBlock(conf.bg_conf)
+        self.res_block = None if conf.res_conf is None else res.ResBlock(conf.res_conf)
     
-    peak_result = peak.process(raw_spectrum, conf.peak_conf)
-    peak_center_i = peak_result.peak_center_i
-    peak_range_i = peak_result.peak_range_i
-    peak_spectrum = peak_result.peak_spectrum
-    if context is not None:
-        context.peak_result = peak_result
-    
-    bg_result = bg.process(raw_spectrum, peak_center_i, peak_range_i, conf.bg_conf)
-    bg_range_i = bg_result.bg_range_i
-    bg_spectrum = bg_result.bg_spectrum
-    if context is not None:
-        context.bg_result = bg_result
-    
-    sp_range_i = peak_range_i
-    sp_spectrum = subtract_bg(peak_range_i, peak_spectrum, bg_range_i, bg_spectrum)
-    sp_result = Result(sp_range_i, sp_spectrum, resolution)
-    if context is not None:
-        context.sp_result = sp_result
-    
-    return sp_result
+    def on_process(self):
+        source_result = self.raw_block.process()
+        raw_spectrum = source_result.raw_spectrum
+        
+        if self.res_block is not None:
+            res_result = self.res_block.process(raw_spectrum)
+            resolution = res_result.resolution
+        else:
+            resolution = None
+        
+        peak_result = self.peak_block.process(raw_spectrum)
+        peak_center_i = peak_result.peak_center_i
+        peak_range_i = peak_result.peak_range_i
+        peak_spectrum = peak_result.peak_spectrum
+        
+        bg_result = self.bg_block.process(raw_spectrum, peak_center_i, peak_range_i)
+        bg_range_i = bg_result.bg_range_i
+        bg_spectrum = bg_result.bg_spectrum
+        
+        sp_range_i = peak_range_i
+        sp_spectrum = subtract_bg(peak_range_i, peak_spectrum, bg_range_i, bg_spectrum)
+        sp_result = Result(sp_range_i, sp_spectrum, resolution)
+        return sp_result
 
 
 # utils

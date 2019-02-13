@@ -1,5 +1,6 @@
 import numpy as np
 
+from spector.utils import ProcessBlock
 from spector.utils.Spectrum import Spectrum
 
 
@@ -17,6 +18,16 @@ class Result:
     def __init__(self, bg_range_i, bg_spectrum):
         self.bg_range_i = bg_range_i
         self.bg_spectrum = bg_spectrum
+
+
+class BgBlock(ProcessBlock):
+    
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+    
+    def on_process(self, raw: Spectrum, peak_center_i, peak_range_i):
+        return process(raw, peak_center_i, peak_range_i, self.conf)
 
 
 # process

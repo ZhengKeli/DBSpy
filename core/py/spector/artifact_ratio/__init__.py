@@ -1,1 +1,1 @@
-from ._ratio import Conf, Result, process
+from ._ratio import Conf, Result, RatioBlock

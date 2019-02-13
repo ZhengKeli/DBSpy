@@ -1,2 +1,2 @@
 from . import artifact_sw, artifact_ratio, spectrum_dbs, utils
-from ._spector import Conf, Result, Context, process
+from ._spector import Conf, Result, SpectorBlock

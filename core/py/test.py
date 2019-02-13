@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 
 import spector
+from spector import SpectorBlock
 
 conf = spector.Conf(
     spectrum_conf_list=[spector.spectrum_dbs.Conf(
-        source_conf=spector.spectrum_dbs.source.Conf(
+        raw_conf=spector.spectrum_dbs.raw.Conf(
             file_path=file_path
         ),
         res_conf=spector.spectrum_dbs.res.Conf(
@@ -41,60 +42,63 @@ conf = spector.Conf(
         )
     ]
 )
-context = spector.Context()
+spector_block = SpectorBlock(conf)
 
 try:
-    spector.process(conf, context)
+    spector_block.process()
 except Exception as e:
     raise e
 
-for spectrum_context in context.spectrum_context_list:
-    if isinstance(spectrum_context, spector.spectrum_dbs.Context):
-        raw_spectrum = spectrum_context.source_result.raw_spectrum
+for spectrum_block in spector_block.spectrum_blocks:
+    if isinstance(spectrum_block, spector.spectrum_dbs.DBSBlock):
+        raw_spectrum = spectrum_block.raw_block.result.raw_spectrum
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
         # plt.show()
         
-        resolution = spectrum_context.res_result.resolution
+        if spectrum_block.res_block is not None:
+            resolution = spectrum_block.res_block.result.resolution
+        else:
+            resolution = None
         print("peak resolution", resolution)
         
-        peak_spectrum = spectrum_context.peak_result.peak_spectrum
-        peak_center = raw_spectrum.x[spectrum_context.peak_result.peak_center_i]
+        peak_spectrum = spectrum_block.peak_block.result.peak_spectrum
+        peak_center = raw_spectrum.x[spectrum_block.peak_block.result.peak_center_i]
         print("peak spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
         # plt.semilogy(peak_spectrum.x, peak_spectrum.y)
         # plt.semilogy((peak_center, peak_center), (0, 1.3 * np.max(peak_spectrum.y)), '--')
         # plt.show()
         
-        bg_spectrum = spectrum_context.bg_result.bg_spectrum
+        bg_spectrum = spectrum_block.bg_block.result.bg_spectrum
         print("bg spectrum")
         # plt.semilogy(peak_spectrum.x, peak_spectrum.y)
         # plt.semilogy(bg_spectrum.x, bg_spectrum.y)
         # plt.show()
         
-        sp_spectrum = spectrum_context.sp_result.sp_spectrum
+        sp_spectrum = spectrum_block.result.sp_spectrum
         print("sp spectrum")
         # plt.semilogy(sp_spectrum.x, sp_spectrum.y)
         # plt.show()
 
-for artifact_result in context.artifact_result_list:
-    if isinstance(artifact_result, spector.artifact_sw.Result):
+for artifact_block in spector_block.artifact_blocks:
+    if isinstance(artifact_block, spector.artifact_sw.SWBlock):
         print("s curve")
-        s_list = tuple([sw_result.s for sw_result in artifact_result.result_list])
-        s_var_list = tuple([sw_result.s_var for sw_result in artifact_result.result_list])
+        s_list = tuple(sw_item.s for sw_item in artifact_block.result.items)
+        s_var_list = tuple(sw_item.s_var for sw_item in artifact_block.result.items)
         # plt.plot(conf.spectrum_tag_list, s_list)
         # plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
         # plt.show()
         
         print("w curve")
-        w_list = tuple([sw_result.w for sw_result in artifact_result.result_list])
-        w_var_list = tuple([sw_result.w_var for sw_result in artifact_result.result_list])
+        w_list = tuple(sw_item.w for sw_item in artifact_block.result.items)
+        w_var_list = tuple(sw_item.w_var for sw_item in artifact_block.result.items)
         # plt.plot(conf.spectrum_tag_list, w_list)
         # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         # plt.show()
-    elif isinstance(artifact_result, spector.artifact_ratio.Result):
+    elif isinstance(artifact_block, spector.artifact_ratio.RatioBlock):
         print("ratio curves")
-        for ratio_sp in artifact_result.ratio_sp_list:
+        for ratio_sp in artifact_block.result.ratio_sp_list:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
             plt.plot(ratio_sp.x, ratio_sp.y)
         plt.legend(conf.spectrum_tag_list)

@@ -1,5 +1,6 @@
 import numpy as np
 
+from spector.utils import ProcessBlock
 from spector.utils.Spectrum import Spectrum
 
 
@@ -16,7 +17,17 @@ class Result:
         self.raw_spectrum = raw_spectrum
 
 
-# dispatch
+class RawBlock(ProcessBlock):
+    
+    def __init__(self, conf: Conf):
+        super().__init__()
+        self.conf = conf
+    
+    def on_process(self):
+        return process(self.conf)
+
+
+# process
 
 def process(conf: Conf) -> Result:
     if conf.file_path is not None:
