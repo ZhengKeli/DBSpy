@@ -1,1 +1,1 @@
-from ._sw import Conf, Result, SWBlock
+from ._sw import Conf, Result, Process

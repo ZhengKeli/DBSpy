@@ -1,6 +1,6 @@
 import numpy as np
 
-from spector.utils import ProcessBlock
+from spector.utils import BaseProcess
 from spector.utils.Spectrum import Spectrum
 from spector.utils.gaussian import gaussian_fwhm, gaussian_fit
 from .peak import Conf
@@ -14,7 +14,7 @@ class Result:
         self.resolution = resolution
 
 
-class ResBlock(ProcessBlock):
+class Process(BaseProcess):
     def __init__(self, conf: Conf):
         super().__init__()
         self.conf = conf

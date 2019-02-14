@@ -2,7 +2,7 @@ from typing import Iterable
 
 import numpy as np
 
-from spector.utils import ProcessBlock
+from spector.utils import BaseProcess
 from spector.utils.Spectrum import Spectrum
 from spector.utils.indexing import search_nearest
 from spector.utils.variance import add_var, sum_var, divide_var
@@ -43,7 +43,7 @@ class Result:
         self.items = items
 
 
-class SWBlock(ProcessBlock):
+class Process(BaseProcess):
     
     def __init__(self, conf: Conf):
         super().__init__()

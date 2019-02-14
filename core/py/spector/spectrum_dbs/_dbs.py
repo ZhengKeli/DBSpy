@@ -1,6 +1,6 @@
 import numpy as np
 
-from spector.utils import ProcessBlock
+from spector.utils import BaseProcess
 from spector.utils import Spectrum
 from . import bg, peak, raw, res
 
@@ -22,15 +22,15 @@ class Result:
         self.sp_resolution = sp_resolution
 
 
-class DBSBlock(ProcessBlock):
+class Process(BaseProcess):
     
     def __init__(self, conf: Conf):
         super().__init__()
         self.conf = conf
-        self.raw_block = raw.RawBlock(conf.raw_conf)
-        self.peak_block = peak.PeakBlock(conf.peak_conf)
-        self.bg_block = bg.BgBlock(conf.bg_conf)
-        self.res_block = None if conf.res_conf is None else res.ResBlock(conf.res_conf)
+        self.raw_block = raw.Process(conf.raw_conf)
+        self.peak_block = peak.Process(conf.peak_conf)
+        self.bg_block = bg.Process(conf.bg_conf)
+        self.res_block = None if conf.res_conf is None else res.Process(conf.res_conf)
     
     def on_process(self):
         source_result = self.raw_block.process()

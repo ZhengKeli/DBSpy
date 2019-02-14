@@ -2,7 +2,7 @@ from typing import Iterable
 
 import numpy as np
 
-from spector.utils import ProcessBlock
+from spector.utils import BaseProcess
 from spector.utils.Spectrum import Spectrum
 from spector.utils.variance import add_var, minus_var, divide_var
 
@@ -20,7 +20,7 @@ class Result:
         self.ratio_sp_list = ratio_sp_list
 
 
-class RatioBlock(ProcessBlock):
+class Process(BaseProcess):
     
     def __init__(self, conf: Conf):
         super().__init__()

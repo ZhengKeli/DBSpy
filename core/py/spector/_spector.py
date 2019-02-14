@@ -1,6 +1,6 @@
 from spector import artifact_sw, artifact_ratio
 from . import spectrum_dbs
-from .utils import ProcessBlock
+from .utils import BaseProcess
 
 
 # define
@@ -17,7 +17,7 @@ class Result:
         self.artifacts_list = artifact_list
 
 
-class SpectorBlock(ProcessBlock):
+class Process(BaseProcess):
     
     def __init__(self, conf: Conf):
         super().__init__()
@@ -26,16 +26,16 @@ class SpectorBlock(ProcessBlock):
         self.spectrum_blocks = []
         for spectrum_conf in conf.spectrum_conf_list:
             if isinstance(spectrum_conf, spectrum_dbs.Conf):
-                self.spectrum_blocks.append(spectrum_dbs.DBSBlock(spectrum_conf))
+                self.spectrum_blocks.append(spectrum_dbs.Process(spectrum_conf))
             else:
                 raise TypeError(f"Unsupported spectrum_conf {spectrum_conf}")
         
         self.artifact_blocks = []
         for artifact_conf in conf.artifact_conf_list:
             if isinstance(artifact_conf, artifact_sw.Conf):
-                self.artifact_blocks.append(artifact_sw.SWBlock(artifact_conf))
+                self.artifact_blocks.append(artifact_sw.Process(artifact_conf))
             elif isinstance(artifact_conf, artifact_ratio.Conf):
-                self.artifact_blocks.append(artifact_ratio.RatioBlock(artifact_conf))
+                self.artifact_blocks.append(artifact_ratio.Process(artifact_conf))
             else:
                 raise TypeError(f"Unsupported artifact_conf {artifact_conf}")
     

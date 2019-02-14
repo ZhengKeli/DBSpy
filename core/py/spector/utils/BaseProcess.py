@@ -1,7 +1,7 @@
 import abc
 
 
-class ProcessBlock:
+class BaseProcess:
     __metaclass__ = abc.ABCMeta
     
     def __init__(self):

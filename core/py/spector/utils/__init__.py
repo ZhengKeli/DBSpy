@@ -1,3 +1,3 @@
 from . import indexing, gaussian, variance
-from .ProcessBlock import ProcessBlock
+from .BaseProcess import BaseProcess
 from .Spectrum import Spectrum

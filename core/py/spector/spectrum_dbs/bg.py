@@ -1,6 +1,6 @@
 import numpy as np
 
-from spector.utils import ProcessBlock
+from spector.utils import BaseProcess
 from spector.utils.Spectrum import Spectrum
 
 
@@ -20,7 +20,7 @@ class Result:
         self.bg_spectrum = bg_spectrum
 
 
-class BgBlock(ProcessBlock):
+class Process(BaseProcess):
     
     def __init__(self, conf: Conf):
         super().__init__()

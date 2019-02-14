@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 import spector
-from spector import SpectorBlock
+from spector import Process
 
 conf = spector.Conf(
     spectrum_conf_list=[spector.spectrum_dbs.Conf(
@@ -42,7 +42,7 @@ conf = spector.Conf(
         )
     ]
 )
-spector_block = SpectorBlock(conf)
+spector_block = Process(conf)
 
 try:
     spector_block.process()
@@ -50,7 +50,7 @@ except Exception as e:
     raise e
 
 for spectrum_block in spector_block.spectrum_blocks:
-    if isinstance(spectrum_block, spector.spectrum_dbs.DBSBlock):
+    if isinstance(spectrum_block, spector.spectrum_dbs.Process):
         raw_spectrum = spectrum_block.raw_block.result.raw_spectrum
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
@@ -82,7 +82,7 @@ for spectrum_block in spector_block.spectrum_blocks:
         # plt.show()
 
 for artifact_block in spector_block.artifact_blocks:
-    if isinstance(artifact_block, spector.artifact_sw.SWBlock):
+    if isinstance(artifact_block, spector.artifact_sw.Process):
         print("s curve")
         s_list = tuple(sw_item.s for sw_item in artifact_block.result.items)
         s_var_list = tuple(sw_item.s_var for sw_item in artifact_block.result.items)
@@ -96,7 +96,7 @@ for artifact_block in spector_block.artifact_blocks:
         # plt.plot(conf.spectrum_tag_list, w_list)
         # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         # plt.show()
-    elif isinstance(artifact_block, spector.artifact_ratio.RatioBlock):
+    elif isinstance(artifact_block, spector.artifact_ratio.Process):
         print("ratio curves")
         for ratio_sp in artifact_block.result.ratio_sp_list:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
