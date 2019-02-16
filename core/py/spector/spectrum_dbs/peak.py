@@ -60,9 +60,7 @@ def process(sp: Spectrum, conf: Conf):
     
     peak_range = (peak_center - peak_radius, peak_center + peak_radius)
     peak_range_i = sp.index(peak_range[0]), sp.index(peak_range[1])
-    
     peak_spectrum = sp[slice(*peak_range_i)]
-    peak_spectrum.var = spectrum_var(peak_spectrum.y)
     return Result(peak_center_i, peak_range_i, peak_spectrum)
 
 

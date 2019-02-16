@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 import spector
 from spector import Process
@@ -21,7 +22,7 @@ conf = spector.Conf(
             bg_expand=1
         )
     ) for file_path in [
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/core/data/" + name + "/energy_smoothed.txt"
+        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/_materials/data/" + name + "/energy_smoothed.txt"
         for name in [
             "0 ppm__1_150218",
             "80 ppm_#4_150515",
@@ -49,11 +50,16 @@ try:
 except Exception as e:
     raise e
 
+plt.figure(figsize=(10, 4))
+plt.tight_layout()
+
 for spectrum_block in spector_block.spectrum_blocks:
     if isinstance(spectrum_block, spector.spectrum_dbs.Process):
         raw_spectrum = spectrum_block.raw_block.result.raw_spectrum
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
+        # plt.xlabel("Энергия γ-кванта, кэВ")
+        # plt.ylabel("Интенсивность")
         # plt.show()
         
         if spectrum_block.res_block is not None:
@@ -86,9 +92,9 @@ for artifact_block in spector_block.artifact_blocks:
         print("s curve")
         s_list = tuple(sw_item.s for sw_item in artifact_block.result.items)
         s_var_list = tuple(sw_item.s_var for sw_item in artifact_block.result.items)
-        # plt.plot(conf.spectrum_tag_list, s_list)
-        # plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
-        # plt.show()
+        plt.plot(conf.spectrum_tag_list, s_list)
+        plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
+        plt.show()
         
         print("w curve")
         w_list = tuple(sw_item.w for sw_item in artifact_block.result.items)
@@ -100,6 +106,7 @@ for artifact_block in spector_block.artifact_blocks:
         print("ratio curves")
         for ratio_sp in artifact_block.result.ratio_sp_list:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
-            plt.plot(ratio_sp.x, ratio_sp.y)
-        plt.legend(conf.spectrum_tag_list)
-        plt.show()
+            # plt.plot(ratio_sp.x, ratio_sp.y)
+            pass
+        # plt.legend(conf.spectrum_tag_list)
+        # plt.show()

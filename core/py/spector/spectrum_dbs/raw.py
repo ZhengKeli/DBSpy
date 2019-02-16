@@ -1,5 +1,6 @@
 import numpy as np
 
+from spector.spectrum_dbs.peak import spectrum_var
 from spector.utils import BaseProcess
 from spector.utils.Spectrum import Spectrum
 
@@ -34,18 +35,17 @@ def process(conf: Conf) -> Result:
         file_path = conf.file_path
         file_type = conf.file_type
         if file_type == 'txt' or file_type is None:
-            raw_spectrum = load_dbs_spectrum_from_txt(file_path)
+            raw_x, raw_y = load_dbs_spectrum_from_txt(file_path)
         else:
             raise TypeError(f"Unsupported file type \"{file_type}\"")
     else:
         raise TypeError("Not provided any source of spectrum.")
-    
-    return Result(raw_spectrum)
+    raw_var = spectrum_var(raw_y)
+    return Result(Spectrum(raw_x, raw_y, raw_var))
 
 
 # execute
 
-def load_dbs_spectrum_from_txt(file_path) -> Spectrum:
+def load_dbs_spectrum_from_txt(file_path):
     m = np.loadtxt(file_path)
-    xs, ys = m[:, 0], m[:, 1]
-    return Spectrum(xs, ys)
+    return m[:, 0], m[:, 1]

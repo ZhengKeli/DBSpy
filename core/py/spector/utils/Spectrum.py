@@ -1,18 +1,19 @@
 from typing import Iterable
 
+import numpy as np
+
 from spector.utils.indexing import index_nearest
 
 
 class Spectrum:
-    def __init__(self, x, y, var=None):
+    def __init__(self, x, y=None, var=None):
         self.x = x
-        self.y = y
-        self.var = var
+        self.y = np.zeros_like(x) if y is None else y
+        self.var = np.zeros_like(x) if var is None else var
     
     def __getitem__(self, key):
         if isinstance(key, slice):
-            new_var = None if self.var is None else self.var[key]
-            return Spectrum(self.x[key], self.y[key], new_var)
+            return Spectrum(self.x[key], self.y[key], self.var[key])
         else:
             return SpectrumPoint(self, key)
     
@@ -40,7 +41,4 @@ class SpectrumPoint:
     
     @property
     def var(self):
-        if self.spectrum.var is not None:
-            return self.spectrum.var[self.index]
-        else:
-            return None
+        return self.spectrum.var[self.index]
