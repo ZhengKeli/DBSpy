@@ -11,7 +11,8 @@ from spector.utils.variance import add_var, sum_var, divide_var
 # define
 
 class Conf:
-    def __init__(self, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
+    def __init__(self, a_radius=None, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
+        self.a_radius = a_radius
         self.s_radius = s_radius
         self.w_radius = w_radius
         self.control_id = control_id
@@ -64,6 +65,13 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
         
         center_i = np.argmax(sp.y)
         center = sp.x[center_i]
+
+        if conf.a_radius is not None:
+            a_radius = conf.a_radius
+            a_range = center - a_radius, center + a_radius
+            a_range_i = sp.index(a_range)
+        else:
+            a_range_i = 0, len(sp)
         
         if conf.s_radius is not None:
             s_radius = conf.s_radius
@@ -90,8 +98,8 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
         w_range_i = sp.index(w_range)
         
         s, s_var = rate_var(sp.y, sp.var, s_range_i[0], s_range_i[1])
-        w1, w1_var = rate_var(sp.y, sp.var, None, w_range_i[0])
-        w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], None)
+        w1, w1_var = rate_var(sp.y, sp.var, a_range_i[0], w_range_i[0])
+        w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], a_range_i[1])
         w, w_var = add_var(w1, w1_var, w2, w2_var)
         result_item = ResultItem(
             s, s_var, s_range_i,
