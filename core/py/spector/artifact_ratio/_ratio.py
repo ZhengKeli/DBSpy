@@ -91,9 +91,9 @@ def fold_sp(sp_list, center_i, mode):
 
 
 def compute_ratio(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
-    scale_list = tuple(np.sum(ys) for ys in ys_list)
-    ys_list = tuple(ys_list[i] / scale_list[i] for i in range(len(ys_list)))
-    ys_var_list = tuple(ys_var_list[i] / np.square(scale_list[i]) for i in range(len(ys_var_list)))
+    scale_list = tuple(len(ys) / np.sum(ys) for ys in ys_list)
+    ys_list = tuple(ys_list[i] * scale_list[i] for i in range(len(ys_list)))
+    ys_var_list = tuple(ys_var_list[i] * np.square(scale_list[i]) for i in range(len(ys_var_list)))
     
     if control_ys is None:
         control_ys = ys_list[0]
