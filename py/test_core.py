@@ -3,7 +3,7 @@ import numpy as np
 
 import spector.core as core
 
-conf = core.Conf(
+conf = core.main.Conf(
     spectrum_conf_list=[core.spectrum_dbs.Conf(
         raw_conf=core.spectrum_dbs.raw.Conf(
             file_path=file_path
@@ -42,7 +42,7 @@ conf = core.Conf(
         )
     ]
 )
-spector_process = core.Process.from_conf(conf)
+spector_process = core.main.Process.from_conf(conf)
 
 try:
     spector_process.process()

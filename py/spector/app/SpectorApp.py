@@ -6,11 +6,11 @@ from .SpectorFrameController import SpectorFrameController
 
 
 class SpectorApp:
-    def __init__(self, spector_process: core.Process = None):
+    def __init__(self, spector_process: core.main.Process = None):
         if spector_process is not None:
             self.spector_process = spector_process
         else:
-            self.spector_process = core.Process([], [])
+            self.spector_process = core.main.Process([], [])
         
         self.window = tk.Tk("Spector")
         
@@ -28,7 +28,7 @@ class SpectorApp:
     def init_menu(self):
         self.menu = tk.Menu(self.window)
         menu_file = tk.Menu(self.menu, tearoff=0)
-        menu_file.add_command(label='New', )
+        menu_file.add_command(label='New')
         menu_file.add_command(label='Open')
         self.menu.add_cascade(label="File", menu=menu_file)
         self.window.config(menu=self.menu)
@@ -50,7 +50,7 @@ class SpectorApp:
             self.tree.insert(main, 'end', text='Spectrum_' + str(i), value=['spectrum', i])
         for i, artifact_process in enumerate(self.spector_process.artifact_process_list):
             self.tree.insert(main, 'end', text='Artifacts_' + str(i), value=['artifact', i])
-
+    
     def on_tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
         values = item['values']
