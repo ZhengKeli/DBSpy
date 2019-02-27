@@ -1,10 +1,10 @@
 import numpy as np
 
-from spector.utils import BaseProcess
-from spector.utils.Spectrum import Spectrum
-from spector.utils.gaussian import gaussian_fwhm, gaussian_fit
 from .peak import Conf
 from .peak import process as peak_process
+from ..utils import BaseProcess
+from ..utils.Spectrum import Spectrum
+from ..utils.gaussian import gaussian_fwhm, gaussian_fit
 
 
 # define

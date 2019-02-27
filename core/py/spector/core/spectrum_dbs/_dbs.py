@@ -1,8 +1,8 @@
 import numpy as np
 
-from spector.utils import BaseProcess
-from spector.utils import Spectrum
 from . import bg, peak, raw, res
+from ..utils import BaseProcess
+from ..utils import Spectrum
 
 
 # define

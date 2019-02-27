@@ -1,13 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 
-import spector
-from SpectorFrameController import SpectorFrameController
+import spector.core as core
+from .SpectorFrameController import SpectorFrameController
 
 
 class SpectorApp:
-    def __init__(self, spector_process: spector.Process):
-        self.spector_process = spector_process
+    def __init__(self, spector_process: core.Process = None):
+        if spector_process is not None:
+            self.spector_process = spector_process
+        else:
+            self.spector_process = core.Process([], [])
+        
         self.window = tk.Tk("Spector")
         
         self.menu = None

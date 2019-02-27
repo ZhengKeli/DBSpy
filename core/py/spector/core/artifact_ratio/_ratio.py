@@ -2,9 +2,9 @@ from typing import Iterable
 
 import numpy as np
 
-from spector.utils import BaseProcess
-from spector.utils.Spectrum import Spectrum
-from spector.utils.variance import add_var, minus_var, divide_var
+from ..utils import BaseProcess
+from ..utils.Spectrum import Spectrum
+from ..utils.variance import add_var, minus_var, divide_var
 
 
 # define

@@ -1,8 +1,8 @@
 import numpy as np
 
-from spector.spectrum_dbs.peak import spectrum_var
-from spector.utils import BaseProcess
-from spector.utils.Spectrum import Spectrum
+from ..spectrum_dbs.peak import spectrum_var
+from ..utils import BaseProcess
+from ..utils.Spectrum import Spectrum
 
 
 # define

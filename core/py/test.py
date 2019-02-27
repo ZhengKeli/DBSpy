@@ -1,23 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import spector
+import spector.core as core
 
-conf = spector.Conf(
-    spectrum_conf_list=[spector.spectrum_dbs.Conf(
-        raw_conf=spector.spectrum_dbs.raw.Conf(
+conf = core.Conf(
+    spectrum_conf_list=[core.spectrum_dbs.Conf(
+        raw_conf=core.spectrum_dbs.raw.Conf(
             file_path=file_path
         ),
-        res_conf=spector.spectrum_dbs.res.Conf(
+        res_conf=core.spectrum_dbs.res.Conf(
             search_center=1157,
             search_radius=5
         ),
-        peak_conf=spector.spectrum_dbs.peak.Conf(
+        peak_conf=core.spectrum_dbs.peak.Conf(
             search_center=510,
             search_radius=5,
             peak_radius=28
         ),
-        bg_conf=spector.spectrum_dbs.bg.Conf(
+        bg_conf=core.spectrum_dbs.bg.Conf(
             bg_expand=1
         )
     ) for file_path in [
@@ -32,17 +32,17 @@ conf = spector.Conf(
     ]],
     spectrum_tag_list=[0, 80, 150, 230, 310, 610],
     artifact_conf_list=[
-        spector.artifact_sw.Conf(
+        core.artifact_sw.Conf(
             control_s=0.5,
             control_w=0.03
         ),
-        spector.artifact_ratio.Conf(
+        core.artifact_ratio.Conf(
             fold_mode='fold',
             compare_mode='subtract'
         )
     ]
 )
-spector_process = spector.Process.from_conf(conf)
+spector_process = core.Process.from_conf(conf)
 
 try:
     spector_process.process()
@@ -53,7 +53,7 @@ plt.figure(figsize=(8, 4))
 plt.tight_layout()
 
 for spectrum_process in spector_process.spectrum_process_list:
-    if isinstance(spectrum_process, spector.spectrum_dbs.Process):
+    if isinstance(spectrum_process, core.spectrum_dbs.Process):
         raw_spectrum = spectrum_process.raw_process.result.raw_spectrum
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
@@ -90,7 +90,7 @@ for spectrum_process in spector_process.spectrum_process_list:
         # plt.show()
 
 for artifact_process in spector_process.artifact_process_list:
-    if isinstance(artifact_process, spector.artifact_sw.Process):
+    if isinstance(artifact_process, core.artifact_sw.Process):
         print("s curve")
         s_list = tuple(sw_item.s for sw_item in artifact_process.result.items)
         s_var_list = tuple(sw_item.s_var for sw_item in artifact_process.result.items)
@@ -104,7 +104,7 @@ for artifact_process in spector_process.artifact_process_list:
         # plt.plot(conf.spectrum_tag_list, w_list)
         # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         # plt.show()
-    elif isinstance(artifact_process, spector.artifact_ratio.Process):
+    elif isinstance(artifact_process, core.artifact_ratio.Process):
         print("ratio curves")
         for ratio_sp in artifact_process.result.ratio_sp_list:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)

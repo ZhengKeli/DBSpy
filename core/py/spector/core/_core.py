@@ -1,4 +1,4 @@
-from spector import artifact_sw, artifact_ratio
+from . import artifact_sw, artifact_ratio
 from . import spectrum_dbs
 from .utils import BaseProcess
 
