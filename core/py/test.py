@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import spector
-from spector import Process
 
 conf = spector.Conf(
     spectrum_conf_list=[spector.spectrum_dbs.Conf(
@@ -43,68 +42,71 @@ conf = spector.Conf(
         )
     ]
 )
-spector_block = Process(conf)
+spector_process = spector.Process.from_conf(conf)
 
 try:
-    spector_block.process()
+    spector_process.process()
 except Exception as e:
     raise e
 
-plt.figure(figsize=(10, 4))
+plt.figure(figsize=(8, 4))
 plt.tight_layout()
 
-for spectrum_block in spector_block.spectrum_blocks:
-    if isinstance(spectrum_block, spector.spectrum_dbs.Process):
-        raw_spectrum = spectrum_block.raw_block.result.raw_spectrum
+for spectrum_process in spector_process.spectrum_process_list:
+    if isinstance(spectrum_process, spector.spectrum_dbs.Process):
+        raw_spectrum = spectrum_process.raw_process.result.raw_spectrum
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
         # plt.xlabel("Энергия γ-кванта, кэВ")
         # plt.ylabel("Интенсивность")
         # plt.show()
         
-        if spectrum_block.res_block is not None:
-            resolution = spectrum_block.res_block.result.resolution
+        if spectrum_process.res_process is not None:
+            resolution = spectrum_process.res_process.result.resolution
         else:
             resolution = None
         print("peak resolution", resolution)
         
-        peak_spectrum = spectrum_block.peak_block.result.peak_spectrum
-        peak_center = raw_spectrum.x[spectrum_block.peak_block.result.peak_center_i]
+        peak_spectrum = spectrum_process.peak_process.result.peak_spectrum
+        peak_center = raw_spectrum.x[spectrum_process.peak_process.result.peak_center_i]
         print("peak spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
         # plt.semilogy(peak_spectrum.x, peak_spectrum.y)
         # plt.semilogy((peak_center, peak_center), (0, 1.3 * np.max(peak_spectrum.y)), '--')
         # plt.show()
         
-        bg_spectrum = spectrum_block.bg_block.result.bg_spectrum
+        bg_spectrum = spectrum_process.bg_process.result.bg_spectrum
         print("bg spectrum")
         # plt.semilogy(peak_spectrum.x, peak_spectrum.y)
         # plt.semilogy(bg_spectrum.x, bg_spectrum.y)
+        # plt.legend(['исходный спектр', 'фон'])
+        # plt.xlabel("Энергия γ-кванта, кэВ")
+        # plt.ylabel("Интенсивность")
         # plt.show()
         
-        sp_spectrum = spectrum_block.result.sp_spectrum
+        sp_spectrum = spectrum_process.result.sp_spectrum
         print("sp spectrum")
         # plt.semilogy(sp_spectrum.x, sp_spectrum.y)
         # plt.show()
 
-for artifact_block in spector_block.artifact_blocks:
-    if isinstance(artifact_block, spector.artifact_sw.Process):
+for artifact_process in spector_process.artifact_process_list:
+    if isinstance(artifact_process, spector.artifact_sw.Process):
         print("s curve")
-        s_list = tuple(sw_item.s for sw_item in artifact_block.result.items)
-        s_var_list = tuple(sw_item.s_var for sw_item in artifact_block.result.items)
+        s_list = tuple(sw_item.s for sw_item in artifact_process.result.items)
+        s_var_list = tuple(sw_item.s_var for sw_item in artifact_process.result.items)
         plt.plot(conf.spectrum_tag_list, s_list)
         plt.errorbar(conf.spectrum_tag_list, s_list, np.sqrt(s_var_list), capsize=3)
         plt.show()
         
         print("w curve")
-        w_list = tuple(sw_item.w for sw_item in artifact_block.result.items)
-        w_var_list = tuple(sw_item.w_var for sw_item in artifact_block.result.items)
+        w_list = tuple(sw_item.w for sw_item in artifact_process.result.items)
+        w_var_list = tuple(sw_item.w_var for sw_item in artifact_process.result.items)
         # plt.plot(conf.spectrum_tag_list, w_list)
         # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         # plt.show()
-    elif isinstance(artifact_block, spector.artifact_ratio.Process):
+    elif isinstance(artifact_process, spector.artifact_ratio.Process):
         print("ratio curves")
-        for ratio_sp in artifact_block.result.ratio_sp_list:
+        for ratio_sp in artifact_process.result.ratio_sp_list:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
             # plt.plot(ratio_sp.x, ratio_sp.y)
             pass
