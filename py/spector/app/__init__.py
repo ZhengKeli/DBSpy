@@ -1,2 +1,2 @@
+from .MainController import MainFrameController
 from .SpectorApp import SpectorApp
-from .SpectorFrameController import SpectorFrameController

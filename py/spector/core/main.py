@@ -14,10 +14,17 @@ class Conf:
 
 class Process(BaseProcess):
     
-    def __init__(self, spectrum_process_list, artifact_process_list):
+    def __init__(self, spectrum_process_list=None, artifact_process_list=None):
         super().__init__()
-        self.spectrum_process_list = spectrum_process_list
-        self.artifact_process_list = artifact_process_list
+        if spectrum_process_list is not None:
+            self.spectrum_process_list = list(spectrum_process_list)
+        else:
+            self.spectrum_process_list = []
+
+        if artifact_process_list is not None:
+            self.artifact_process_list = list(artifact_process_list)
+        else:
+            self.artifact_process_list = []
     
     @staticmethod
     def from_conf(conf: Conf):

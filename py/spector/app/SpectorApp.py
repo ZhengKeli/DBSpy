@@ -2,15 +2,15 @@ import tkinter as tk
 from tkinter import ttk
 
 import spector.core as core
-from .SpectorFrameController import SpectorFrameController
+from .MainController import MainFrameController
 
 
 class SpectorApp:
-    def __init__(self, spector_process: core.main.Process = None):
-        if spector_process is not None:
-            self.spector_process = spector_process
+    def __init__(self, process: core.main.Process = None):
+        if process is not None:
+            self.process = process
         else:
-            self.spector_process = core.main.Process([], [])
+            self.process = core.main.Process()
         
         self.window = tk.Tk("Spector")
         
@@ -20,7 +20,7 @@ class SpectorApp:
         self.tree: ttk.Treeview = None
         self.init_tree()
         
-        self.frame_controller = None
+        self.controller = None
         self.init_frame()
         
         self.window.mainloop()
@@ -46,9 +46,9 @@ class SpectorApp:
     def update_tree(self):
         self.tree.delete(*self.tree.get_children())
         main = self.tree.insert('', 'end', text='Main', value=['main'])
-        for i, spectrum_process in enumerate(self.spector_process.spectrum_process_list):
+        for i, spectrum_process in enumerate(self.process.spectrum_process_list):
             self.tree.insert(main, 'end', text='Spectrum_' + str(i), value=['spectrum', i])
-        for i, artifact_process in enumerate(self.spector_process.artifact_process_list):
+        for i, artifact_process in enumerate(self.process.artifact_process_list):
             self.tree.insert(main, 'end', text='Artifacts_' + str(i), value=['artifact', i])
     
     def on_tree_clicked(self, _):
@@ -61,16 +61,16 @@ class SpectorApp:
         self.update_frame(['main'])
     
     def update_frame(self, key=None):
-        if self.frame_controller is not None:
-            self.frame_controller.frame.destroy()
+        if self.controller is not None:
+            self.controller.frame.destroy()
         
         if key is None or len(key) == 0:
-            self.frame_controller = None
+            self.controller = None
             return
-
+    
         if key[0] == 'main':
-            self.frame_controller = SpectorFrameController(self)
-            self.frame_controller.frame.pack(side='left', fill='both')
+            self.controller = MainFrameController(self)
+            self.controller.frame.pack(side='left', fill='both')
         elif key[0] == 'spectrum':
             pass
         elif key[0] == 'artifact':

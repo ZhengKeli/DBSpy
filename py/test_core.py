@@ -42,17 +42,14 @@ conf = core.main.Conf(
         )
     ]
 )
-spector_process = core.main.Process.from_conf(conf)
+main_process = core.main.Process.from_conf(conf)
 
-try:
-    spector_process.process()
-except Exception as e:
-    raise e
+main_process.process()
 
 plt.figure(figsize=(8, 4))
 plt.tight_layout()
 
-for spectrum_process in spector_process.spectrum_process_list:
+for spectrum_process in main_process.spectrum_process_list:
     if isinstance(spectrum_process, core.spectrum_dbs.Process):
         raw_spectrum = spectrum_process.raw_process.result.raw_spectrum
         print("raw spectrum")
@@ -89,7 +86,7 @@ for spectrum_process in spector_process.spectrum_process_list:
         # plt.semilogy(sp_spectrum.x, sp_spectrum.y)
         # plt.show()
 
-for artifact_process in spector_process.artifact_process_list:
+for artifact_process in main_process.artifact_process_list:
     if isinstance(artifact_process, core.artifact_sw.Process):
         print("s curve")
         s_list = tuple(sw_item.s for sw_item in artifact_process.result.items)
