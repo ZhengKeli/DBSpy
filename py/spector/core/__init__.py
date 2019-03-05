@@ -1,2 +1,3 @@
-from . import artifact_sw, artifact_ratio, spectrum_dbs, utils
-from . import main
+from . import artifact
+from . import spectrum
+from .main import MainConf, MainProcess

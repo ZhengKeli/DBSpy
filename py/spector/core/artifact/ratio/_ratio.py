@@ -2,9 +2,9 @@ from typing import Iterable
 
 import numpy as np
 
-from ..utils import BaseProcess
-from ..utils.Spectrum import Spectrum
-from ..utils.variance import add_var, minus_var, divide_var
+from spector.core.base import BaseProcess
+from spector.utils.spectrum import Spectrum
+from spector.utils.variance import add_var, minus_var, divide_var
 
 
 # define
@@ -13,11 +13,6 @@ class Conf:
     def __init__(self, fold_mode: str = None, compare_mode: str = None):
         self.fold_mode = fold_mode
         self.compare_mode = compare_mode
-
-
-class Result:
-    def __init__(self, ratio_sp_list):
-        self.ratio_sp_list = ratio_sp_list
 
 
 class Process(BaseProcess):
@@ -39,7 +34,7 @@ def process(sp_list: Iterable[Spectrum], conf: Conf):
     ys_var_list = tuple(sp_fold.var for sp_fold in sp_fold_list)
     ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
     ratio_sp_list = tuple(Spectrum(sp_fold_list[i].x, ratio_list[i], ratio_var_list[i]) for i in range(len(sp_list)))
-    return Result(ratio_sp_list)
+    return ratio_sp_list
 
 
 # utils

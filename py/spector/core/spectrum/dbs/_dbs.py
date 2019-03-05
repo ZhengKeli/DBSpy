@@ -1,8 +1,8 @@
 import numpy as np
 
+from spector.core.base import BaseProcess
+from spector.utils.spectrum import Spectrum
 from . import bg, peak, raw, res
-from ..utils import BaseProcess
-from ..utils import Spectrum
 
 
 # define
@@ -46,12 +46,12 @@ class Process(BaseProcess):
             resolution = self.res_process.process(raw_spectrum)
         else:
             resolution = None
-    
+
         peak_result = self.peak_process.process(raw_spectrum)
         peak_center_i = peak_result.peak_center_i
         peak_range_i = peak_result.peak_range_i
         peak_spectrum = peak_result.peak_spectrum
-    
+
         bg_result = self.bg_process.process(raw_spectrum, peak_center_i, peak_range_i)
         bg_range_i = bg_result.bg_range_i
         bg_spectrum = bg_result.bg_spectrum

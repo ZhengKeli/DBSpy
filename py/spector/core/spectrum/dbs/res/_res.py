@@ -1,13 +1,17 @@
 import numpy as np
 
-from .peak import Conf
-from .peak import process as peak_process
-from ..utils import BaseProcess
-from ..utils.Spectrum import Spectrum
-from ..utils.gaussian import gaussian_fwhm, gaussian_fit
+from spector.core.base import BaseProcess
+from spector.utils.gaussian import gaussian_fwhm, gaussian_fit
+from spector.utils.spectrum import Spectrum
+from ..peak import Conf as peakConf
+from ..peak._peak import process as peak_process
 
 
 # define
+
+class Conf(peakConf):
+    pass
+
 
 class Process(BaseProcess):
     def __init__(self, conf: Conf = None):

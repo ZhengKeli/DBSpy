@@ -1,25 +1,25 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import spector.core as core
+from spector import core
 
 # C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/_materials/data/0 ppm__1_150218/energy_smoothed.txt
 
-conf = core.main.Conf(
-    spectrum_conf_list=[core.spectrum_dbs.Conf(
-        raw_conf=core.spectrum_dbs.raw.Conf(
+conf = core.MainConf(
+    spectrum_conf_list=[core.spectrum.dbs.Conf(
+        raw_conf=core.spectrum.dbs.raw.Conf(
             file_path=file_path
         ),
-        res_conf=core.spectrum_dbs.res.Conf(
+        res_conf=core.spectrum.dbs.res.Conf(
             search_center=1157,
             search_radius=5
         ),
-        peak_conf=core.spectrum_dbs.peak.Conf(
+        peak_conf=core.spectrum.dbs.peak.Conf(
             search_center=510,
             search_radius=5,
             peak_radius=28
         ),
-        bg_conf=core.spectrum_dbs.bg.Conf(
+        bg_conf=core.spectrum.dbs.bg.Conf(
             bg_expand=1
         )
     ) for file_path in [
@@ -34,25 +34,24 @@ conf = core.main.Conf(
     ]],
     spectrum_tag_list=[0, 80, 150, 230, 310, 610],
     artifact_conf_list=[
-        core.artifact_sw.Conf(
+        core.artifact.sw.Conf(
             control_s=0.5,
             control_w=0.03
         ),
-        core.artifact_ratio.Conf(
+        core.artifact.ratio.Conf(
             fold_mode='fold',
             compare_mode='subtract'
         )
     ]
 )
-main_process = core.main.Process.from_conf(conf)
-
+main_process = conf.apply()
 main_process.process()
 
 plt.figure(figsize=(8, 4))
 plt.tight_layout()
 
 for spectrum_process in main_process.spectrum_process_list:
-    if isinstance(spectrum_process, core.spectrum_dbs.Process):
+    if isinstance(spectrum_process, core.spectrum.dbs.Process):
         raw_spectrum = spectrum_process.raw_process.result
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
@@ -89,7 +88,7 @@ for spectrum_process in main_process.spectrum_process_list:
         # plt.show()
 
 for artifact_process in main_process.artifact_process_list:
-    if isinstance(artifact_process, core.artifact_sw.Process):
+    if isinstance(artifact_process, core.artifact.sw.Process):
         print("s curve")
         s_list = tuple(sw_item.s for sw_item in artifact_process.result.items)
         s_var_list = tuple(sw_item.s_var for sw_item in artifact_process.result.items)
@@ -103,9 +102,9 @@ for artifact_process in main_process.artifact_process_list:
         # plt.plot(conf.spectrum_tag_list, w_list)
         # plt.errorbar(conf.spectrum_tag_list, w_list, np.sqrt(w_var_list), capsize=3)
         # plt.show()
-    elif isinstance(artifact_process, core.artifact_ratio.Process):
+    elif isinstance(artifact_process, core.artifact.ratio.Process):
         print("ratio curves")
-        for ratio_sp in artifact_process.result.ratio_sp_list:
+        for ratio_sp in artifact_process.result:
             # plt.errorbar(ratio_sp.x, ratio_sp.y, np.sqrt(ratio_sp.var), capsize=3)
             # plt.plot(ratio_sp.x, ratio_sp.y)
             pass

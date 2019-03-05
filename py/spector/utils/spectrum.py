@@ -2,7 +2,7 @@ from typing import Iterable
 
 import numpy as np
 
-from ..utils.indexing import index_nearest
+from spector.utils.indexing import index_nearest
 
 
 class Spectrum:

@@ -1,7 +1,7 @@
 import numpy as np
 
-from ..utils import BaseProcess
-from ..utils.Spectrum import Spectrum
+from spector.core.base import BaseProcess
+from spector.utils.spectrum import Spectrum
 
 
 # define
