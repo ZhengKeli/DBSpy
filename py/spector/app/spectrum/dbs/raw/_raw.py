@@ -3,10 +3,10 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from spector.app.FrameController import FrameController
+from spector.app.base import BaseController
 
 
-class RawController(FrameController):
+class Controller(BaseController):
     def __init__(self, app, index):
         super().__init__(app)
         self.index = index

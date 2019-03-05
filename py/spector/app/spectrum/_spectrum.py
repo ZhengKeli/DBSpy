@@ -1,9 +1,9 @@
 import tkinter as tk
 
-from spector.app.FrameController import FrameController
+from spector.app.base import BaseController
 
 
-class SpectrumController(FrameController):
+class Controller(BaseController):
     def __init__(self, app, index):
         super().__init__(app)
         self.index = index

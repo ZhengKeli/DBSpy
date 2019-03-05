@@ -1,18 +1,18 @@
 import tkinter as tk
 from tkinter import ttk
 
-import spector.core as core
-from . import spectrum_dbs
-from .MainController import MainController
+from spector.app.main import MainController
+from . import spectrum
+from .. import core
 
 
 class Application:
-    def __init__(self, process: core.main.Process = None):
+    def __init__(self, process: core.MainProcess = None):
         if process is not None:
             self.process = process
         else:
-            self.process = core.main.Process()
-
+            self.process = core.MainProcess()
+        
         self.window = tk.Tk()
         self.window.title("PositronSpector")
         
@@ -89,11 +89,11 @@ class Application:
         elif key[0] == 'spectrum':
             spectrum_index = key[1]
             spectrum_process = self.process.spectrum_process_list[spectrum_index]
-            if isinstance(spectrum_process, core.spectrum_dbs.Process):
+            if isinstance(spectrum_process, core.spectrum.dbs.Process):
                 if len(key) == 2:
-                    self.controller = spectrum_dbs.SpectrumController(self, spectrum_index)
+                    self.controller = spectrum.Controller(self, spectrum_index)
                 elif key[2] == 'raw':
-                    self.controller = spectrum_dbs.RawController(self, spectrum_index)
+                    self.controller = spectrum.dbs.raw.Controller(self, spectrum_index)
                 elif key[2] == 'res':
                     pass
                 elif key[2] == 'peak':

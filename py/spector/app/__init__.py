@@ -1,3 +1,3 @@
-from .Application import Application
-from .FrameController import FrameController
-from .MainController import MainController
+from . import spectrum
+from ._app import Application
+from .main import MainController
