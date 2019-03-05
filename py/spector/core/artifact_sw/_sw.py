@@ -46,9 +46,9 @@ class Result:
 
 class Process(BaseProcess):
     
-    def __init__(self, conf: Conf):
+    def __init__(self, conf: Conf = None):
         super().__init__()
-        self.conf = conf
+        self.conf = None if conf is None else conf
     
     def on_process(self, sp_list: Iterable[Spectrum]):
         return process(sp_list, self.conf)

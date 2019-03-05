@@ -24,21 +24,26 @@ class Result:
 
 class Process(BaseProcess):
     
-    def __init__(self, conf: Conf):
+    def __init__(self, raw_process=None, res_process=None, peak_process=None, bg_process=None):
         super().__init__()
-        self.conf = conf
-        self.raw_process = raw.Process(conf.raw_conf)
-        self.peak_process = peak.Process(conf.peak_conf)
-        self.bg_process = bg.Process(conf.bg_conf)
-        self.res_process = None if conf.res_conf is None else res.Process(conf.res_conf)
+        self.raw_process = raw.Process() if raw_process is None else raw_process
+        self.res_process = None if res_process is None else res_process
+        self.peak_process = peak.Process() if peak_process is None else peak_process
+        self.bg_process = bg.Process() if bg_process is None else bg_process
+    
+    @staticmethod
+    def from_conf(conf: Conf):
+        raw_process = raw.Process(conf.raw_conf)
+        peak_process = peak.Process(conf.peak_conf)
+        bg_process = bg.Process(conf.bg_conf)
+        res_process = None if conf.res_conf is None else res.Process(conf.res_conf)
+        return Process(raw_process, res_process, peak_process, bg_process)
     
     def on_process(self):
-        source_result = self.raw_process.process()
-        raw_spectrum = source_result.raw_spectrum
-    
+        raw_spectrum = self.raw_process.process()
+        
         if self.res_process is not None:
-            res_result = self.res_process.process(raw_spectrum)
-            resolution = res_result.resolution
+            resolution = self.res_process.process(raw_spectrum)
         else:
             resolution = None
     

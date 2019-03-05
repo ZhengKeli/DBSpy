@@ -13,16 +13,11 @@ class Conf:
         self.file_type = file_type
 
 
-class Result:
-    def __init__(self, raw_spectrum: Spectrum):
-        self.raw_spectrum = raw_spectrum
-
-
 class Process(BaseProcess):
     
-    def __init__(self, conf: Conf):
+    def __init__(self, conf: Conf = None):
         super().__init__()
-        self.conf = conf
+        self.conf = Conf() if conf is None else conf
     
     def on_process(self):
         return process(self.conf)
@@ -30,7 +25,7 @@ class Process(BaseProcess):
 
 # process
 
-def process(conf: Conf) -> Result:
+def process(conf: Conf) -> Spectrum:
     if conf.file_path is not None:
         file_path = conf.file_path
         file_type = conf.file_type
@@ -41,7 +36,7 @@ def process(conf: Conf) -> Result:
     else:
         raise TypeError("Not provided any source of spectrum.")
     raw_var = spectrum_var(raw_y)
-    return Result(Spectrum(raw_x, raw_y, raw_var))
+    return Spectrum(raw_x, raw_y, raw_var)
 
 
 # execute

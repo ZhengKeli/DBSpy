@@ -9,15 +9,10 @@ from ..utils.gaussian import gaussian_fwhm, gaussian_fit
 
 # define
 
-class Result:
-    def __init__(self, resolution):
-        self.resolution = resolution
-
-
 class Process(BaseProcess):
-    def __init__(self, conf: Conf):
+    def __init__(self, conf: Conf = None):
         super().__init__()
-        self.conf = conf
+        self.conf = None if conf is None else conf
     
     def on_process(self, sp: Spectrum):
         return process(sp, self.conf)
@@ -25,10 +20,10 @@ class Process(BaseProcess):
 
 # process
 
-def process(sp: Spectrum, conf: Conf) -> Result:
+def process(sp: Spectrum, conf: Conf) -> float:
     peak_result = peak_process(sp, conf)
     resolution = compute_resolution(peak_result.peak_range_i, peak_result.peak_center_i, peak_result.peak_spectrum)
-    return Result(resolution)
+    return resolution
 
 
 # utils

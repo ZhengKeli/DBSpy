@@ -3,6 +3,8 @@ import numpy as np
 
 import spector.core as core
 
+# C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/_materials/data/0 ppm__1_150218/energy_smoothed.txt
+
 conf = core.main.Conf(
     spectrum_conf_list=[core.spectrum_dbs.Conf(
         raw_conf=core.spectrum_dbs.raw.Conf(
@@ -51,7 +53,7 @@ plt.tight_layout()
 
 for spectrum_process in main_process.spectrum_process_list:
     if isinstance(spectrum_process, core.spectrum_dbs.Process):
-        raw_spectrum = spectrum_process.raw_process.result.raw_spectrum
+        raw_spectrum = spectrum_process.raw_process.result
         print("raw spectrum")
         # plt.plot(raw_spectrum.x, raw_spectrum.y)
         # plt.xlabel("Энергия γ-кванта, кэВ")
@@ -59,7 +61,7 @@ for spectrum_process in main_process.spectrum_process_list:
         # plt.show()
         
         if spectrum_process.res_process is not None:
-            resolution = spectrum_process.res_process.result.resolution
+            resolution = spectrum_process.res_process.result
         else:
             resolution = None
         print("peak resolution", resolution)

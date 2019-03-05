@@ -22,9 +22,9 @@ class Result:
 
 class Process(BaseProcess):
     
-    def __init__(self, conf: Conf):
+    def __init__(self, conf: Conf = None):
         super().__init__()
-        self.conf = conf
+        self.conf = Conf() if conf is None else conf
     
     def on_process(self, raw: Spectrum, peak_center_i, peak_range_i):
         return process(raw, peak_center_i, peak_range_i, self.conf)

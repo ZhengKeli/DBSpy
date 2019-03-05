@@ -16,22 +16,15 @@ class Process(BaseProcess):
     
     def __init__(self, spectrum_process_list=None, artifact_process_list=None):
         super().__init__()
-        if spectrum_process_list is not None:
-            self.spectrum_process_list = list(spectrum_process_list)
-        else:
-            self.spectrum_process_list = []
-
-        if artifact_process_list is not None:
-            self.artifact_process_list = list(artifact_process_list)
-        else:
-            self.artifact_process_list = []
+        self.spectrum_process_list = [] if spectrum_process_list is None else list(spectrum_process_list)
+        self.artifact_process_list = [] if artifact_process_list is None else list(artifact_process_list)
     
     @staticmethod
     def from_conf(conf: Conf):
         spectrum_process_list = []
         for spectrum_conf in conf.spectrum_conf_list:
             if isinstance(spectrum_conf, spectrum_dbs.Conf):
-                spectrum_process_list.append(spectrum_dbs.Process(spectrum_conf))
+                spectrum_process_list.append(spectrum_dbs.Process.from_conf(spectrum_conf))
             else:
                 raise TypeError(f"Unsupported spectrum_conf {spectrum_conf}")
         
