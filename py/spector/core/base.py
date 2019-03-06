@@ -8,13 +8,10 @@ class BaseProcess:
         self.result = None
     
     def process(self, *args, **kwargs):
-        try:
-            self.result = self.on_process(*args, **kwargs)
-            return self.result
-        except Exception as exception:
-            self.result = None
-            raise exception
-
+        self.result = None
+        self.result = self.on_process(*args, **kwargs)
+        return self.result
+    
     def try_process(self, *args, **kwargs):
         try:
             return self.process(*args, **kwargs)
