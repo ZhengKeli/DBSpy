@@ -8,10 +8,8 @@ from .. import core
 
 class Application:
     def __init__(self, process: core.MainProcess = None):
-        if process is not None:
-            self.process = process
-        else:
-            self.process = core.MainProcess()
+        self.process = process if isinstance(process, core.MainProcess) else core.MainProcess()
+        self.process.try_process()
         
         self.window = tk.Tk()
         self.window.title("PositronSpector")
@@ -21,7 +19,7 @@ class Application:
         
         self.tree: ttk.Treeview = None
         self.init_tree()
-
+    
         self.container = tk.Frame(self.window, width=500, height=500)
         self.container.pack(side='left', fill='both', padx='4p', pady='4p')
         self.controller = None

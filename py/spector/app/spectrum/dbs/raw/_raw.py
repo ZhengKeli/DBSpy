@@ -52,10 +52,10 @@ class Controller(BaseController):
     
     def apply(self):
         self.process.conf.file_path = self.conf_file_path.get()
+        self.app.process.try_process()
         self.update()
 
     def update(self):
-        self.app.process.try_process()
         raw_spectrum = self.process.result
 
         self.result_figure.clear()
