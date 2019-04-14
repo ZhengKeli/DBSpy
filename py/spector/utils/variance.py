@@ -27,3 +27,9 @@ def divide_var(x1, x1_var, x2, x2_var):
 
 def sum_var(x, x_var):
     return np.sum(x), np.sum(x_var)
+
+
+def spectrum_var(ys, ys_sum=None):
+    if ys_sum is None:
+        ys_sum = np.sum(ys)
+    return ys * (1 - ys / ys_sum)

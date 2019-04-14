@@ -2,7 +2,7 @@ import numpy as np
 
 from spector.core.base import BaseProcess
 from spector.utils.spectrum import Spectrum
-from ..peak._peak import spectrum_var
+from spector.utils.variance import spectrum_var
 
 
 # define
