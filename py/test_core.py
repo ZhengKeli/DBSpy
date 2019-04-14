@@ -22,7 +22,7 @@ conf = conf.main.Conf(
             bg_expand=1
         )
     ) for file_path in [
-        "C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/_materials/data/" + name + "/energy_smoothed.txt"
+        "../_materials/data/" + name + "/energy_smoothed.txt"
         for name in [
             "0 ppm__1_150218",
             "80 ppm_#4_150515",

@@ -16,8 +16,8 @@ class Application:
         
         self.menu = None
         self.init_menu()
-        
-        self.tree: ttk.Treeview = None
+
+        self.tree = None
         self.init_tree()
     
         self.container = tk.Frame(self.window, width=500, height=500)
@@ -46,7 +46,7 @@ class Application:
         pass
     
     def init_tree(self):
-        self.tree = ttk.Treeview(self.window, show="tree")
+        self.tree: ttk.Treeview = ttk.Treeview(self.window, show="tree")
         self.tree.pack(side='left', fill='y')
         self.tree.bind('<ButtonRelease-1>', self.on_tree_clicked)
         self.update_tree()
@@ -75,9 +75,9 @@ class Application:
         self.update_frame(['main'])
     
     def update_frame(self, key=None):
-        if self.controller is not None:
-            self.controller.frame.destroy()
-            self.controller = None
+        self.controller = None
+        for child in self.container.winfo_children():
+            child.destroy()
         
         if key is None or len(key) == 0:
             return

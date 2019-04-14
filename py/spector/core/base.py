@@ -1,8 +1,7 @@
 import abc
 
 
-class BaseProcess:
-    __metaclass__ = abc.ABCMeta
+class BaseProcess(abc.ABC):
     
     def __init__(self):
         self.result = None
