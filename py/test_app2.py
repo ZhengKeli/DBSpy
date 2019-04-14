@@ -1,8 +1,9 @@
+from spector import conf
 from spector import core
 from spector.app import Application
 
 if __name__ == '__main__':
-    conf = core.MainConf(
+    main_conf = conf.main.Conf(
         spectrum_conf_list=[core.spectrum.dbs.Conf(
             raw_conf=core.spectrum.dbs.raw.Conf(
                 file_path=file_path
@@ -41,5 +42,5 @@ if __name__ == '__main__':
             )
         ]
     )
-    main_process = conf.apply()
+    main_process = main_conf.apply()
     Application(main_process)

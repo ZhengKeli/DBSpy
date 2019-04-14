@@ -7,7 +7,7 @@ from spector.app.base import BaseController
 class MainController(BaseController):
     def __init__(self, app):
         super().__init__(app)
-        self.process: core.MainProcess = app.process
+        self.process: core.main.Process = app.process
 
         self.spectrum_text = tk.StringVar()
         self.artifact_text = tk.StringVar()

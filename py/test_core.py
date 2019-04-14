@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from spector import conf
 from spector import core
 
-# C:/Users/keli/OneDrive/Develop/Projects/PositronSpector/_materials/data/0 ppm__1_150218/energy_smoothed.txt
-
-conf = core.MainConf(
+conf = conf.main.Conf(
     spectrum_conf_list=[core.spectrum.dbs.Conf(
         raw_conf=core.spectrum.dbs.raw.Conf(
             file_path=file_path

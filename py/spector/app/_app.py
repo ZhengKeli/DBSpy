@@ -7,8 +7,8 @@ from .. import core
 
 
 class Application:
-    def __init__(self, process: core.MainProcess = None):
-        self.process = process if isinstance(process, core.MainProcess) else core.MainProcess()
+    def __init__(self, process: core.main.Process = None):
+        self.process = process if isinstance(process, core.main.Process) else core.main.Process()
         self.process.try_process()
         
         self.window = tk.Tk()
