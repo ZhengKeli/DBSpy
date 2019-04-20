@@ -30,12 +30,13 @@ class Controller(BaseController):
         tk.Button(apply_frame, text='Reset', command=self.reset).pack(side='left')
         
         # result
-        self.result_state = tk.StringVar()
-        self.result_figure: plt.Figure = plt.figure()
-
         result_frame = tk.LabelFrame(self.frame, text='Result:')
         result_frame.grid(row=2, column=0, sticky='nesw')
+
+        self.result_state = tk.StringVar()
         tk.Label(result_frame, textvariable=self.result_state).pack(anchor='w', fill='both')
+
+        self.result_figure: plt.Figure = plt.figure(figsize=(5, 3))
         canvas = FigureCanvasTkAgg(self.result_figure, result_frame)
         canvas.draw()
         toolbar = NavigationToolbar2Tk(canvas, result_frame)
@@ -62,8 +63,9 @@ class Controller(BaseController):
         if isinstance(raw_spectrum, Spectrum):
             self.result_state.set("State:Success")
             self.result_figure.gca().plot(raw_spectrum.x, raw_spectrum.y)
+            self.result_figure.tight_layout()
+            self.result_figure.canvas.draw()
+            self.result_figure.canvas.flush_events()
         else:
             self.result_state.set("State:Error")
             # todo show info
-        self.result_figure.canvas.draw()
-        self.result_figure.canvas.flush_events()
