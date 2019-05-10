@@ -1,25 +1,25 @@
 import tkinter as tk
 from tkinter import ttk
 
+import dbs.core as core
 from dbs.app.main import MainController
+from dbs.core import Process
 from . import spectrum
-from .. import core
 
 
 class Application:
-    def __init__(self, process: core.main.Process = None):
-        self.process = process if isinstance(process, core.main.Process) else core.main.Process()
-        self.process.try_process()
+    def __init__(self, process: Process = None):
+        self.process: Process = Process() if process is None else process
         
         self.window = tk.Tk()
         self.window.title("PositronSpector")
         
         self.menu = None
         self.init_menu()
-
+        
         self.tree = None
         self.init_tree()
-    
+        
         self.container = tk.Frame(self.window, width=500, height=500)
         self.container.pack(side='left', fill='both', padx='4p', pady='4p')
         self.controller = None
@@ -54,16 +54,16 @@ class Application:
     def update_tree(self):
         self.tree.delete(*self.tree.get_children())
         main_node = self.tree.insert('', 'end', text='Main', value=['main'], open=True)
-        
-        for i, spectrum_process in enumerate(self.process.spectrum_process_list):
+
+        for i, spectrum_process in enumerate(self.process.spectrum_processes):
             spectrum_node = self.tree.insert(main_node, 'end', text='Spectrum_' + str(i), value=['spectrum', i])
             self.tree.insert(spectrum_node, 'end', text='raw data', value=['spectrum', i, 'raw'])
             self.tree.insert(spectrum_node, 'end', text='resolution', value=['spectrum', i, 'res'])
             self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
-        
-        for i, artifact_process in enumerate(self.process.artifact_process_list):
-            self.tree.insert(main_node, 'end', text='Artifact_' + str(i), value=['artifact', i])
+
+        for i, artifact_process in enumerate(self.process.artifact_processes):
+            self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['artifact', i])
     
     def on_tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
@@ -86,7 +86,7 @@ class Application:
             self.controller = MainController(self)
         elif key[0] == 'spectrum':
             spectrum_index = key[1]
-            spectrum_process = self.process.spectrum_process_list[spectrum_index]
+            spectrum_process = self.process.spectrum_processes[spectrum_index]
             if isinstance(spectrum_process, core.spectrum.dbs.Process):
                 if len(key) == 2:
                     self.controller = spectrum.Controller(self, spectrum_index)

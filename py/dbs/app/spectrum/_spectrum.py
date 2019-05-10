@@ -11,8 +11,8 @@ class Controller(BaseController):
     def __init__(self, app, index):
         super().__init__(app)
         self.index = index
-        self.process = app.process.spectrum_process_list[index]
-
+        self.process = app.process.spectrum_processes[index]
+        
         # info
         tk.Label(self.frame, text='This is a DBS Spectrum').grid(row=0)
 
@@ -35,9 +35,8 @@ class Controller(BaseController):
         self.update()
 
     def update(self):
-        result = self.process.result
-        sp_spectrum = None if result is None else result.sp_spectrum
-    
+        _, sp_spectrum, _ = self.process.value
+        
         self.result_figure.clear()
         if isinstance(sp_spectrum, Spectrum):
             self.result_state.set("State:Success")

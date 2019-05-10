@@ -11,7 +11,7 @@ class Controller(BaseController):
     def __init__(self, app, index):
         super().__init__(app)
         self.index = index
-        self.process = app.process.spectrum_process_list[index].raw_process
+        self.process = app.process.spectrum_processes[index].raw_process
         
         # conf
         self.conf_file_path = tk.StringVar()
@@ -57,7 +57,7 @@ class Controller(BaseController):
         self.update()
 
     def update(self):
-        raw_spectrum = self.process.result
+        raw_spectrum = self.process.value
 
         self.result_figure.clear()
         if isinstance(raw_spectrum, Spectrum):
