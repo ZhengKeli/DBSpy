@@ -2,7 +2,8 @@ from typing import Iterable
 
 import numpy as np
 
-from dbs.core.base import BaseProcess
+from dbs.core import base
+from dbs.core.artifact import _artifact as artifact
 from dbs.utils.indexing import search_nearest
 from dbs.utils.spectrum import Spectrum
 from dbs.utils.variance import add_var, sum_var, divide_var
@@ -10,7 +11,7 @@ from dbs.utils.variance import add_var, sum_var, divide_var
 
 # define
 
-class Conf:
+class Conf(artifact.Conf):
     def __init__(self, a_radius=None, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
         self.a_radius = a_radius
         self.s_radius = s_radius
@@ -19,48 +20,21 @@ class Conf:
         self.control_s = control_s
         self.control_w = control_w
 
-
-class ResultItem:
-    def __init__(self, s, s_var, s_range_i, w, w_var, w_range_i, w1, w1_var, w1_range, w2, w2_var, w2_range):
-        self.s = s
-        self.s_var = s_var
-        self.s_range_i = s_range_i
-        
-        self.w = w
-        self.w_var = w_var
-        self.w_range_i = w_range_i
-        
-        self.w2 = w2
-        self.w2_var = w2_var
-        self.w2_range = w2_range
-        
-        self.w1 = w1
-        self.w1_var = w1_var
-        self.w1_range = w1_range
+    @staticmethod
+    def create_process(cluster_block):
+        return Process(cluster_block)
 
 
-class Result:
-    def __init__(self, items: Iterable[ResultItem]):
-        self.items = items
+class Process(base.ElementProcess):
+    def __init__(self, cluster_block):
+        super().__init__(process_func, Conf(), cluster_block)
 
 
-class Process(BaseProcess):
-    
-    def __init__(self, conf: Conf = None):
-        super().__init__()
-        self.conf = None if conf is None else conf
-    
-    def on_process(self, sp_list: Iterable[Spectrum]):
-        return process(sp_list, self.conf)
-
-
-# process
-
-def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
-    result_list = []
+def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
+    sw_list = []
     control_s_radius = None
     control_w_radius = None
-    for sp in sp_list:
+    for _, sp, _ in sp_result_list:
         sum_ys = np.sum(sp.y)
         
         center_i = np.argmax(sp.y)
@@ -101,13 +75,14 @@ def process(sp_list: Iterable[Spectrum], conf: Conf) -> Result:
         w1, w1_var = rate_var(sp.y, sp.var, a_range_i[0], w_range_i[0])
         w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], a_range_i[1])
         w, w_var = add_var(w1, w1_var, w2, w2_var)
-        result_item = ResultItem(
-            s, s_var, s_range_i,
-            w, w_var, w_range_i,
-            w1, w1_var, (0, w_range_i[0]),
-            w2, w2_var, (w_range_i[0], len(sp)))
-        result_list.append(result_item)
-    return Result(result_list)
+
+        sw_list.append((
+            (s, s_var, s_range_i),
+            (w, w_var, w_range_i),
+            (w1, w1_var, (0, w_range_i[0])),
+            (w2, w2_var, (w_range_i[0], len(sp))),
+        ))
+    return tuple(sw_list)
 
 
 # utils

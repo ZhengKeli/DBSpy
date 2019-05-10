@@ -1,12 +1,12 @@
 import numpy as np
 
-from dbs.core.base import BaseProcess
+from dbs.core import base
 from dbs.utils.spectrum import Spectrum
 
 
 # define
 
-class Conf:
+class Conf(base.ElementConf):
     def __init__(self, bg_radius=None, bg_range=None, bg_expand=None, bg_algorithm=None):
         self.radius = bg_radius
         self.range = bg_range
@@ -14,51 +14,40 @@ class Conf:
         self.bg_algorithm = bg_algorithm
 
 
-class Result:
-    def __init__(self, bg_range_i, bg_spectrum):
-        self.bg_range_i = bg_range_i
-        self.bg_spectrum = bg_spectrum
+class Process(base.ElementProcess):
+    def __init__(self, raw_process, peak_process):
+        super().__init__(process_func, Conf(), raw_process.block, peak_process.block)
 
 
-class Process(BaseProcess):
+def process_func(raw_sp: Spectrum, peak_res, conf: Conf):
+    peak_center_i, peak_range_i, _ = peak_res
     
-    def __init__(self, conf: Conf = None):
-        super().__init__()
-        self.conf = Conf() if conf is None else conf
-    
-    def on_process(self, raw: Spectrum, peak_center_i, peak_range_i):
-        return process(raw, peak_center_i, peak_range_i, self.conf)
-
-
-# process
-
-def process(raw: Spectrum, peak_center_i, peak_range_i, conf: Conf) -> Result:
     if conf.range is not None:
         bg_range = conf.range
-        bg_range_i = raw.index(bg_range[0]), raw.index(bg_range[1])
+        bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
     elif conf.radius is not None:
-        peak_center = raw.x[peak_center_i]
+        peak_center = raw_sp.x[peak_center_i]
         bg_range = (peak_center - conf.radius, peak_center + conf.radius)
-        bg_range_i = raw.index(bg_range[0]), raw.index(bg_range[1])
+        bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
     else:
         bg_range_i = peak_range_i
-        bg_range = raw.x[peak_range_i[0]], raw.x[peak_range_i[1]]
+        bg_range = raw_sp.x[peak_range_i[0]], raw_sp.x[peak_range_i[1]]
     
     bg_expand = 0.0 if conf.bg_expand is None else conf.bg_expand
     if isinstance(bg_expand, float) or isinstance(bg_expand, int):
         bg_expand = [bg_expand, bg_expand]
     
     expanded_range = bg_range[0] - bg_expand[0], bg_range[1] + bg_expand[1]
-    ex_range_i = raw.index(expanded_range[0]), raw.index(expanded_range[1])
+    ex_range_i = raw_sp.index(expanded_range[0]), raw_sp.index(expanded_range[1])
     
     bg_algorithm = conf.bg_algorithm
     if bg_algorithm == 'volumeLinear' or bg_algorithm is None:
-        bg_y = volume_linear_bg(raw.y, *bg_range_i, *ex_range_i)
-        bg_spectrum = Spectrum(raw.x[slice(*bg_range_i)], bg_y)
+        bg_y = volume_linear_bg(raw_sp.y, *bg_range_i, *ex_range_i)
+        bg_spectrum = Spectrum(raw_sp.x[slice(*bg_range_i)], bg_y)
     else:
         raise TypeError(f"not supported bg_type:{type(conf)}")
     
-    return Result(bg_range_i, bg_spectrum)
+    return bg_range_i, bg_spectrum
 
 
 # utils

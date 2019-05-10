@@ -2,38 +2,38 @@ from typing import Iterable
 
 import numpy as np
 
-from dbs.core.base import BaseProcess
+from dbs.core import base
+from dbs.core.artifact import _artifact as artifact
 from dbs.utils.spectrum import Spectrum
 from dbs.utils.variance import add_var, minus_var, divide_var
 
 
 # define
 
-class Conf:
+class Conf(artifact.Conf):
     def __init__(self, fold_mode: str = None, compare_mode: str = None):
         self.fold_mode = fold_mode
         self.compare_mode = compare_mode
 
-
-class Process(BaseProcess):
-    
-    def __init__(self, conf: Conf = None):
-        super().__init__()
-        self.conf = None if conf is None else conf
-    
-    def on_process(self, sp_list: Iterable[Spectrum]):
-        return process(sp_list, self.conf)
+    @staticmethod
+    def create_process(cluster_block):
+        return Process(cluster_block)
 
 
-# process
+class Process(base.ElementProcess):
+    def __init__(self, cluster_block):
+        super().__init__(process_func, Conf(), cluster_block)
 
-def process(sp_list: Iterable[Spectrum], conf: Conf):
+
+def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
+    sp_list = tuple(sp for _, sp, _ in sp_result_list)
     sp_list, center_i = align_peak(sp_list)
     sp_fold_list = fold_sp(sp_list, center_i, conf.fold_mode)
     ys_list = tuple(sp_fold.y for sp_fold in sp_fold_list)
     ys_var_list = tuple(sp_fold.var for sp_fold in sp_fold_list)
     ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
-    ratio_sp_list = tuple(Spectrum(sp_fold_list[i].x, ratio_list[i], ratio_var_list[i]) for i in range(len(sp_list)))
+    ratio_sp_list = tuple(
+        Spectrum(sp_fold_list[i].x, ratio_list[i], ratio_var_list[i]) for i in range(len(sp_list)))
     return ratio_sp_list
 
 

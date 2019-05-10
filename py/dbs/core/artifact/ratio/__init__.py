@@ -1,1 +1,1 @@
-from ._ratio import Process, Conf
+from ._ratio import Conf, Process

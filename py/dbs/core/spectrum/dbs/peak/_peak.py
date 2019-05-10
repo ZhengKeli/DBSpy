@@ -1,12 +1,12 @@
 import numpy as np
 
-from dbs.core.base import BaseProcess
+from dbs.core import base
 from dbs.utils.spectrum import Spectrum
 
 
 # define
 
-class Conf:
+class Conf(base.ElementConf):
     def __init__(self, search_center=None, search_radius=None, search_range=None, peak_center=None, peak_radius=None):
         self.search_center = search_center
         self.search_radius = search_radius
@@ -15,26 +15,12 @@ class Conf:
         self.peak_radius = peak_radius
 
 
-class Result:
-    def __init__(self, peak_center_i, peak_range_i, peak_spectrum: Spectrum):
-        self.peak_center_i = peak_center_i
-        self.peak_range_i = peak_range_i
-        self.peak_spectrum = peak_spectrum
+class Process(base.ElementProcess):
+    def __init__(self, raw_process):
+        super().__init__(process_func, Conf(), raw_process.block)
 
 
-class Process(BaseProcess):
-    
-    def __init__(self, conf: Conf = None):
-        super().__init__()
-        self.conf = Conf() if conf is None else conf
-    
-    def on_process(self, sp: Spectrum):
-        return process(sp, self.conf)
-
-
-# process
-
-def process(sp: Spectrum, conf: Conf):
+def process_func(sp: Spectrum, conf: Conf):
     if conf.search_range is not None:
         search_range = conf.search_range
     elif conf.search_center is not None and conf.search_radius is not None:
@@ -61,7 +47,7 @@ def process(sp: Spectrum, conf: Conf):
     peak_range = (peak_center - peak_radius, peak_center + peak_radius)
     peak_range_i = sp.index(peak_range[0]), sp.index(peak_range[1])
     peak_spectrum = sp[slice(*peak_range_i)]
-    return Result(peak_center_i, peak_range_i, peak_spectrum)
+    return peak_center_i, peak_range_i, peak_spectrum
 
 
 # utils

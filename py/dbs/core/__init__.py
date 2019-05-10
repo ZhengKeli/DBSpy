@@ -1,3 +1,2 @@
-from . import artifact
-from . import main
-from . import spectrum
+from . import spectrum, artifact
+from ._main import Conf, Process

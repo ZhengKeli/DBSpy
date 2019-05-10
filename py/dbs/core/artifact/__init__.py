@@ -1,2 +1,2 @@
-from . import ratio
-from . import sw
+from . import sw, ratio
+from ._artifact import Conf

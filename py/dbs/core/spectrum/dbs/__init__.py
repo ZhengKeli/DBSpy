@@ -1,2 +1,2 @@
-from . import raw, peak, bg, res
-from ._dbs import Conf, Result, Process
+from . import raw, res, peak, bg
+from ._dbs import Conf, Process
