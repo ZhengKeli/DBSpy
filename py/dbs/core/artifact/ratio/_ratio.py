@@ -5,7 +5,7 @@ import numpy as np
 from dbs.core import base
 from dbs.core.artifact import _artifact as artifact
 from dbs.utils.spectrum import Spectrum
-from dbs.utils.variance import add_var, minus_var, divide_var
+from dbs.utils.variance import add_var, minus_var, divide_var, times_var, sum_var
 
 
 # define
@@ -28,12 +28,13 @@ class Process(base.ElementProcess):
 def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
     sp_list = tuple(sp for _, sp, _ in sp_result_list)
     sp_list, center_i = align_peak(sp_list)
-    sp_fold_list = fold_sp(sp_list, center_i, conf.fold_mode)
-    ys_list = tuple(sp_fold.y for sp_fold in sp_fold_list)
-    ys_var_list = tuple(sp_fold.var for sp_fold in sp_fold_list)
+    sp_list = tuple(fold_sp(sp, center_i, conf.fold_mode) for sp in sp_list)
+    ys_list, ys_var_list = zip(*((sp_fold.y, sp_fold.var) for sp_fold in sp_list))
+    ys_list, ys_var_list = normalize(ys_list, ys_var_list)
     ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
     ratio_sp_list = tuple(
-        Spectrum(sp_fold_list[i].x, ratio_list[i], ratio_var_list[i]) for i in range(len(sp_list)))
+        Spectrum(sp.x, ratio, ratio_var)
+        for sp, ratio, ratio_var in zip(sp_list, ratio_list, ratio_var_list))
     return ratio_sp_list
 
 
@@ -51,53 +52,47 @@ def align_peak(sp_list):
     return sp_list, center_i_min
 
 
-def fold_sp(sp_list, center_i, mode):
+def fold_sp(sp, center_i, mode):
     if mode == 'none' or mode is None:
-        return sp_list
+        return sp
     elif mode == 'left':
-        left_list = []
-        for sp in sp_list:
-            center = sp.x[center_i]
-            left_sp = sp[:center_i + 1]
-            left_sp = Spectrum(np.flip(center - left_sp.x), np.flip(left_sp.y), np.flip(left_sp.var))
-            left_list.append(left_sp)
-        return left_list
+        center = sp.x[center_i]
+        sp = sp[:center_i + 1]
+        return Spectrum(np.flip(center - sp.x), np.flip(sp.y), np.flip(sp.var))
     elif mode == 'right':
-        left_list = []
-        for sp in sp_list:
-            center = sp.x[center_i]
-            left_sp = sp[center_i:]
-            left_sp = Spectrum(left_sp.x - center, left_sp.y, left_sp.var)
-            left_list.append(left_sp)
-        return left_list
+        center = sp.x[center_i]
+        sp = sp[center_i:]
+        return Spectrum(sp.x - center, sp.y, sp.var)
     elif mode == 'fold':
-        sp_left_list = fold_sp(sp_list, center_i, 'left')
-        sp_right_list = fold_sp(sp_list, center_i, 'right')
-        len_min = min(len(sp_left_list[0]), len(sp_right_list[0]))
-        fold_list = []
-        for i in range(len(sp_list)):
-            sp_left = sp_left_list[i][:len_min]
-            sp_right = sp_right_list[i][:len_min]
-            ys, ys_var = add_var(sp_left.y, sp_left.var, sp_right.y, sp_right.var)
-            fold_list.append(Spectrum(sp_right.x, ys, ys_var))
-        return fold_list
+        sp_left = fold_sp(sp, center_i, 'left')
+        sp_right = fold_sp(sp, center_i, 'right')
+        len_min = min(len(sp_left), len(sp_right))
+        sp_left = sp_left[:len_min]
+        sp_right = sp_right[:len_min]
+        ys, ys_var = add_var(sp_left.y, sp_left.var, sp_right.y, sp_right.var)
+        return Spectrum(sp_right.x, ys, ys_var)
     else:
         raise TypeError("Unsupported fold mode")
 
 
+def normalize(ys_list, ys_var_list, control_ys=None, control_ys_var=None):
+    control_ys = ys_list[0] if control_ys is None else control_ys
+    control_ys_var = ys_var_list[0] if control_ys_var is None else control_ys_var
+    control_sum, control_sum_var = sum_var(control_ys, control_ys_var)
+    norm_ys_list, norm_ys_var_list = [], []
+    for ys, ys_var in zip(ys_list, ys_var_list):
+        ys_sum, ys_sum_var = sum_var(ys, ys_var)
+        scale, scale_var = divide_var(control_sum, control_sum_var, ys_sum, ys_sum_var)
+        norm_ys, norm_ys_var = times_var(ys, ys_var, scale, scale_var)
+        norm_ys_list.append(norm_ys)
+        norm_ys_var_list.append(norm_ys_var)
+    return norm_ys_list, norm_ys_var_list
+
+
 def compute_ratio(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
-    scale_list = tuple(len(ys) / np.sum(ys) for ys in ys_list)
-    ys_list = tuple(ys_list[i] * scale_list[i] for i in range(len(ys_list)))
-    ys_var_list = tuple(ys_var_list[i] * np.square(scale_list[i]) for i in range(len(ys_var_list)))
-    
-    if control_ys is None:
-        control_ys = ys_list[0]
-    
-    if control_ys_var is None:
-        control_ys_var = ys_var_list[0]
-    
-    ratio_list = []
-    ratio_var_list = []
+    control_ys = ys_list[0] if control_ys is None else control_ys
+    control_ys_var = ys_var_list[0] if control_ys_var is None else control_ys_var
+    ratio_list, ratio_var_list = [], []
     for i in range(len(ys_list)):
         ys = ys_list[i]
         ys_var = ys_var_list[i]
