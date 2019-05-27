@@ -3,7 +3,7 @@ from typing import Iterable
 import numpy as np
 
 from dbspy.core import base
-from dbspy.core.analyze import _analyze as artifact
+from dbspy.core.analyze import _analyze as analyze
 from dbspy.utils.indexing import search_nearest
 from dbspy.utils.spectrum import Spectrum
 from dbspy.utils.variance import add_var, sum_var, divide_var
@@ -11,7 +11,7 @@ from dbspy.utils.variance import add_var, sum_var, divide_var
 
 # define
 
-class Conf(artifact.Conf):
+class Conf(analyze.Conf):
     def __init__(self, a_radius=None, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
         self.a_radius = a_radius
         self.s_radius = s_radius

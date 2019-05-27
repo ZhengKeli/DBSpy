@@ -62,7 +62,7 @@ class Application:
             self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
 
-        for i, artifact_process in enumerate(self.process.artifact_processes):
+        for i, analyze_process in enumerate(self.process.analyze_processes):
             self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['analyze', i])
     
     def on_tree_clicked(self, _):
