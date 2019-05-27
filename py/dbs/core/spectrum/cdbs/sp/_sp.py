@@ -22,7 +22,7 @@ class Process(base.ElementProcess):
 
 
 def process_func(peak_result, conf: Conf):
-    ((xd, xm), y, y_var), (pd_center_i, pm_center_i) = peak_result
+    _, ((xd, xm), y, y_var), (pd_center_i, pm_center_i) = peak_result
     
     xm_range_i = index_nearest(neighborhood(xm[pm_center_i], conf.sp_band_radius), xm)
     xm_range_i = remain_one(*xm_range_i)

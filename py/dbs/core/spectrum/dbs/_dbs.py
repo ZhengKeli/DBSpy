@@ -41,8 +41,11 @@ class Process(base.Process):
         self.res_process = res.Process(self.raw_process)
         self.peak_process = peak.Process(self.raw_process)
         self.bg_process = bg.Process(self.raw_process, self.peak_process)
-        integrate_block = FunctionBlock(integrate_func, self.res_process.block, self.peak_process.block,
-                                        self.bg_process.block)
+        integrate_block = FunctionBlock(
+            integrate_func,
+            self.res_process.block,
+            self.peak_process.block,
+            self.bg_process.block)
         super().__init__(integrate_block)
     
     @property
@@ -59,7 +62,7 @@ class Process(base.Process):
 
 def integrate_func(res_result, peak_result, bg_result):
     resolution = res_result
-    peak_center_i, peak_range_i, peak_spectrum = peak_result
+    peak_range_i, peak_spectrum, _ = peak_result
     bg_range_i, bg_spectrum = bg_result
     sp_spectrum = subtract_bg(peak_range_i, peak_spectrum, bg_range_i, bg_spectrum)
     return sp_spectrum, resolution

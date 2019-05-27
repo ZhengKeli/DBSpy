@@ -21,13 +21,13 @@ class Process(base.ElementProcess):
 
 def process_func(raw_result, peak_res, conf: Conf):
     raw_sp = Spectrum(*raw_result)
-    peak_center_i, peak_range_i, _ = peak_res
+    peak_range_i, _, peak_center_i = peak_res
     
     if conf.range is not None:
         bg_range = conf.range
         bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
     elif conf.radius is not None:
-        peak_center = raw_sp.x[peak_center_i]
+        peak_center = raw_sp.x[peak_center_i + peak_range_i[0]]
         bg_range = (peak_center - conf.radius, peak_center + conf.radius)
         bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
     else:

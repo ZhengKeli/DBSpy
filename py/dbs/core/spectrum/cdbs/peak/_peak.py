@@ -47,8 +47,8 @@ def process_func(raw_result, conf: Conf):
     y_var = y_var[slice(*peak_range_i), slice(*peak_range_j)]
     peak_i -= peak_range_i[0]
     peak_j -= peak_range_j[0]
-    
-    return ((xd, xm), y, y_var), (peak_i, peak_j)
+
+    return (peak_range_i, peak_range_j), ((xd, xm), y, y_var), (peak_i, peak_j)
 
 
 # utils

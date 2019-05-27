@@ -18,8 +18,8 @@ class Process(base.ElementProcess):
 
 
 def process_func(raw_sp: Spectrum, conf: Conf) -> float:
-    peak_center_i, peak_range_i, peak_spectrum = peak.process_func(raw_sp, conf)
-    resolution = compute_resolution(peak_range_i, peak_center_i, peak_spectrum)
+    peak_range_i, peak_spectrum, peak_center_i = peak.process_func(raw_sp, conf)
+    resolution = compute_resolution(peak_range_i, peak_center_i + peak_range_i[0], peak_spectrum)
     return resolution
 
 
