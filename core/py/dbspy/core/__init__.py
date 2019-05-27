@@ -1,2 +1,2 @@
-from . import spectrum, artifact
+from . import spectrum, analyze
 from ._main import Conf, Process

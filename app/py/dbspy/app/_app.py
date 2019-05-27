@@ -63,7 +63,7 @@ class Application:
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
 
         for i, artifact_process in enumerate(self.process.artifact_processes):
-            self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['artifact', i])
+            self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['analyze', i])
     
     def on_tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
@@ -99,8 +99,8 @@ class Application:
                 elif key[2] == 'bg':
                     pass  # todo sub items of spectrum
             pass
-        elif key[0] == 'artifact':
-            #  todo artifact frame
+        elif key[0] == 'analyze':
+            #  todo analyze frame
             pass
 
         if self.controller is not None:

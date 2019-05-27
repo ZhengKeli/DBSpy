@@ -3,7 +3,7 @@ from typing import Iterable
 import numpy as np
 
 from dbspy.core import base
-from dbspy.core.artifact import _artifact as artifact
+from dbspy.core.analyze import _analyze as artifact
 from dbspy.utils.spectrum import Spectrum
 from dbspy.utils.variance import add_var, minus_var, divide_var, times_var, sum_var
 

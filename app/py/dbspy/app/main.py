@@ -19,8 +19,8 @@ class MainController(BaseController):
             anchor='w')
         
         tk.Label(self.frame, textvariable=self.artifact_text).pack(anchor='w', pady='10p 0')
-        tk.Button(self.frame, text='New artifact SW', command=self.on_new_artifact_sw).pack(anchor='w')
-        tk.Button(self.frame, text='New artifact Ratio', command=self.on_new_artifact_ratio).pack(anchor='w')
+        tk.Button(self.frame, text='New analyze SW', command=self.on_new_artifact_sw).pack(anchor='w')
+        tk.Button(self.frame, text='New analyze Ratio', command=self.on_new_artifact_ratio).pack(anchor='w')
 
         self.reset()
 
@@ -39,11 +39,11 @@ class MainController(BaseController):
         raise RuntimeError("CDBS spectrums currently not supported")
 
     def on_new_artifact_sw(self):
-        new_artifact_process = core.artifact.sw.Process(self.process.spectrum_cluster_block)
+        new_artifact_process = core.analyze.sw.Process(self.process.spectrum_cluster_block)
         self.process.artifact_processes += [new_artifact_process]
         self.app.update_tree()
 
     def on_new_artifact_ratio(self):
-        new_artifact_process = core.artifact.ratio.Process(self.process.spectrum_cluster_block)
+        new_artifact_process = core.analyze.ratio.Process(self.process.spectrum_cluster_block)
         self.process.artifact_processes += [new_artifact_process]
         self.app.update_tree()

@@ -1,4 +1,4 @@
-from dbspy.core import base, spectrum, artifact
+from dbspy.core import base, spectrum, analyze
 from dbspy.utils.block import ClusterBlock
 
 
@@ -16,7 +16,7 @@ class Conf(base.Conf):
     def decode(cls, code: dict):
         return cls(
             tuple(spectrum.Conf.decode(c) for c in code['spectrum_cluster']),
-            tuple(artifact.Conf.decode(c) for c in code['artifact_cluster']))
+            tuple(analyze.Conf.decode(c) for c in code['analyze_cluster']))
 
 
 class Process(base.Process):
