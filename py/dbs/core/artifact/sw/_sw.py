@@ -34,7 +34,7 @@ def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
     sw_list = []
     control_s_radius = None
     control_w_radius = None
-    for _, sp, _ in sp_result_list:
+    for sp, _ in sp_result_list:
         sum_ys = np.sum(sp.y)
         
         center_i = np.argmax(sp.y)

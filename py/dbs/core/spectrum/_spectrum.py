@@ -16,9 +16,8 @@ class Conf(base.Conf, abc.ABC):
         return process
     
     def encode(self):
-        from . import dbs
-        # t = {dbs.Conf: 'dbs', cdbs.Conf: 'cdbs'}[type(self)]
-        t = {dbs.Conf: 'dbs'}[type(self)]
+        from . import dbs, cdbs
+        t = {dbs.Conf: 'dbs', cdbs.Conf: 'cdbs'}[type(self)]
         return {
             'type': t,
             **self.encode_content()
@@ -26,9 +25,8 @@ class Conf(base.Conf, abc.ABC):
     
     @classmethod
     def decode(cls, code):
-        from . import dbs
-        # c = {'dbs': dbs.Conf, 'cdbs': cdbs.Conf}[code['type']]
-        c = {'dbs': dbs.Conf}[code['type']]
+        from . import dbs, cdbs
+        c = {'dbs': dbs.Conf, 'cdbs': cdbs.Conf}[code['type']]
         content_code = code.copy()
         del content_code['type']
         return c.decode_content(content_code)

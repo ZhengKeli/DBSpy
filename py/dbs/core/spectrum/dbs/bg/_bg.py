@@ -19,7 +19,8 @@ class Process(base.ElementProcess):
         super().__init__(process_func, Conf(), raw_process.block, peak_process.block)
 
 
-def process_func(raw_sp: Spectrum, peak_res, conf: Conf):
+def process_func(raw_result, peak_res, conf: Conf):
+    raw_sp = Spectrum(*raw_result)
     peak_center_i, peak_range_i, _ = peak_res
     
     if conf.range is not None:

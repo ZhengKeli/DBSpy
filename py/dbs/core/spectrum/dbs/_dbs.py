@@ -61,15 +61,13 @@ def integrate_func(res_result, peak_result, bg_result):
     resolution = res_result
     peak_center_i, peak_range_i, peak_spectrum = peak_result
     bg_range_i, bg_spectrum = bg_result
-    
-    sp_range_i = peak_range_i
     sp_spectrum = subtract_bg(peak_range_i, peak_spectrum, bg_range_i, bg_spectrum)
-    return sp_range_i, sp_spectrum, resolution
+    return sp_spectrum, resolution
 
 
 # utils
 
-def subtract_bg(peak_range_i, peak_spectrum: Spectrum, bg_range_i, bg_spectrum: Spectrum):
+def subtract_bg(peak_range_i, peak_spectrum: Spectrum, bg_range_i, bg_spectrum: Spectrum) -> Spectrum:
     padding = max(bg_range_i[0] - peak_range_i[0], 0), max(peak_range_i[1] - bg_range_i[1], 0)
     cropping = max(peak_range_i[0] - bg_range_i[0], 0), max(bg_range_i[1] - peak_range_i[1], 0)
     

@@ -26,7 +26,7 @@ class Process(base.ElementProcess):
 
 
 def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
-    sp_list = tuple(sp for _, sp, _ in sp_result_list)
+    sp_list = tuple(sp for sp, _ in sp_result_list)
     sp_list, center_i = align_peak(sp_list)
     sp_list = tuple(fold_sp(sp, center_i, conf.fold_mode) for sp in sp_list)
     ys_list, ys_var_list = zip(*((sp_fold.y, sp_fold.var) for sp_fold in sp_list))

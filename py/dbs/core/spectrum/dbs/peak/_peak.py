@@ -1,7 +1,9 @@
 import numpy as np
+from scipy import ndimage
 
 from dbs.core import base
 from dbs.utils.spectrum import Spectrum
+from dbs.utils.variance import spectrum_var
 
 
 # define
@@ -20,7 +22,10 @@ class Process(base.ElementProcess):
         super().__init__(process_func, Conf(), raw_process.block)
 
 
-def process_func(sp: Spectrum, conf: Conf):
+def process_func(raw_result, conf: Conf):
+    sp = Spectrum(*raw_result)
+    sp.var = spectrum_var(sp.y)
+    
     if conf.search_range is not None:
         search_range = conf.search_range
     elif conf.search_center is not None and conf.search_radius is not None:
@@ -39,7 +44,8 @@ def process_func(sp: Spectrum, conf: Conf):
         peak_center = conf.peak_center
         peak_center_i = sp.index(peak_center)
     elif search_range is not None:
-        peak_center_i = search_peak_center_i(sp.y, sp.index(search_range[0]), sp.index(search_range[1]))
+        y_blur = ndimage.gaussian_filter1d(sp.y, 3.0)
+        peak_center_i = search_peak_center_i(y_blur, sp.index(search_range[0]), sp.index(search_range[1]))
         peak_center = sp.x[peak_center_i]
     else:
         raise RuntimeError("Cannot define the index of peak center.")
