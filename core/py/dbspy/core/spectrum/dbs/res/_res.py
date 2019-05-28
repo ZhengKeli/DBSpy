@@ -3,7 +3,6 @@ import numpy as np
 from dbspy.core import base
 from dbspy.core.spectrum.dbs.peak import _peak as peak
 from dbspy.utils.gaussian import gaussian_fwhm, gaussian_fit
-from dbspy.utils.spectrum import Spectrum
 
 
 # define
@@ -17,8 +16,8 @@ class Process(base.ElementProcess):
         super().__init__(process_func, Conf(), raw_process.block)
 
 
-def process_func(raw_sp: Spectrum, conf: Conf) -> float:
-    peak_range_i, peak_spectrum, peak_center_i = peak.process_func(raw_sp, conf)
+def process_func(raw_result, conf: Conf) -> float:
+    peak_range_i, peak_spectrum, peak_center_i = peak.process_func(raw_result, conf)
     resolution = compute_resolution(peak_range_i, peak_center_i + peak_range_i[0], peak_spectrum)
     return resolution
 
