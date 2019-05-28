@@ -19,7 +19,7 @@ class Conf(analyze.Conf):
         self.control_id = control_id
         self.control_s = control_s
         self.control_w = control_w
-
+    
     @staticmethod
     def create_process(cluster_block):
         return Process(cluster_block)
@@ -39,7 +39,7 @@ def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
         
         center_i = np.argmax(sp.y)
         center = sp.x[center_i]
-
+        
         if conf.a_radius is not None:
             a_radius = conf.a_radius
             a_range = center - a_radius, center + a_radius
@@ -71,16 +71,16 @@ def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
         w_range = center - w_radius, center + w_radius
         w_range_i = sp.index(w_range)
         
-        s, s_var = rate_var(sp.y, sp.var, s_range_i[0], s_range_i[1])
+        s, s_var = rate_var(sp.y, sp.var, *s_range_i)
         w1, w1_var = rate_var(sp.y, sp.var, a_range_i[0], w_range_i[0])
         w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], a_range_i[1])
         w, w_var = add_var(w1, w1_var, w2, w2_var)
-
+        
         sw_list.append((
             (s, s_var, s_range_i),
-            (w, w_var, w_range_i),
-            (w1, w1_var, (0, w_range_i[0])),
-            (w2, w2_var, (w_range_i[0], len(sp))),
+            (w, w_var),
+            (w1, w1_var, (a_range_i[0], w_range_i[0])),
+            (w2, w2_var, (w_range_i[1], a_range_i[1])),
         ))
     return tuple(sw_list)
 
