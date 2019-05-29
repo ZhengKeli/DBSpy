@@ -36,6 +36,16 @@ class Process(base.Process):
         self._spectrum_processes = tuple(spectrum_processes)
         self._spectrum_cluster_block.blocks = tuple(process.block for process in spectrum_processes)
     
+    def append_spectrum_process(self, spectrum_process):
+        spectrum_processes = list(self.spectrum_processes)
+        spectrum_processes.append(spectrum_process)
+        self.spectrum_processes = spectrum_processes
+    
+    def remove_spectrum_process(self, spectrum_process):
+        spectrum_processes = list(self.spectrum_processes)
+        spectrum_processes.remove(spectrum_process)
+        self.spectrum_processes = spectrum_processes
+    
     @property
     def analyze_processes(self):
         return self._analyze_processes
@@ -44,6 +54,16 @@ class Process(base.Process):
     def analyze_processes(self, analyze_processes):
         self._analyze_processes = tuple(analyze_processes)
         self._analyze_cluster_block.blocks = tuple(process.block for process in analyze_processes)
+    
+    def append_analyze_process(self, analyze_process):
+        analyze_processes = list(self.analyze_processes)
+        analyze_processes.append(analyze_process)
+        self.analyze_processes = analyze_processes
+    
+    def remove_analyze_process(self, analyze_process):
+        analyze_processes = list(self.analyze_processes)
+        analyze_processes.remove(analyze_process)
+        self.analyze_processes = analyze_processes
     
     @property
     def spectrum_cluster_block(self):

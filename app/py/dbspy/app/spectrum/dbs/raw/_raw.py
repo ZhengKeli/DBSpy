@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 from dbspy.app.base import BaseController
-from dbspy.utils.spectrum import Spectrum
 
 
 class Controller(BaseController):
@@ -15,14 +14,14 @@ class Controller(BaseController):
         
         # conf
         self.conf_file_path = tk.StringVar()
-
+        
         conf_frame = tk.LabelFrame(self.frame, text='Configuration')
         conf_frame.grid(row=0, column=0, sticky='nesw')
         tk.Label(conf_frame, text='File path:').pack(anchor='w')
         tk.Entry(conf_frame, textvariable=self.conf_file_path).pack(anchor='w', fill='both')
         
         self.reset()
-
+        
         # operation
         apply_frame = tk.Frame(self.frame)
         apply_frame.grid(row=1, column=0, sticky='ew')
@@ -32,17 +31,17 @@ class Controller(BaseController):
         # result
         result_frame = tk.LabelFrame(self.frame, text='Result:')
         result_frame.grid(row=2, column=0, sticky='nesw')
-
+        
         self.result_state = tk.StringVar()
         tk.Label(result_frame, textvariable=self.result_state).pack(anchor='w', fill='both')
-
+        
         self.result_figure: plt.Figure = plt.figure(figsize=(5, 3))
         canvas = FigureCanvasTkAgg(self.result_figure, result_frame)
         canvas.draw()
         toolbar = NavigationToolbar2Tk(canvas, result_frame)
         toolbar.update()
         canvas.get_tk_widget().pack(anchor='w', fill='both')
-
+        
         self.update()
     
     def reset(self):
@@ -55,17 +54,15 @@ class Controller(BaseController):
         self.process.conf.file_path = self.conf_file_path.get()
         self.app.process.try_process()
         self.update()
-
+    
     def update(self):
-        raw_spectrum = self.process.value
-
         self.result_figure.clear()
-        if isinstance(raw_spectrum, Spectrum):
-            self.result_state.set("State:Success")
-            self.result_figure.gca().plot(raw_spectrum.x, raw_spectrum.y)
-            self.result_figure.tight_layout()
-            self.result_figure.canvas.draw()
-            self.result_figure.canvas.flush_events()
-        else:
-            self.result_state.set("State:Error")
+        try:
+            x, y = self.process.value
+            self.result_figure.gca().plot(x, y)
+        except Exception:
+            self.result_state.set("Error!")
             # todo show info
+        self.result_figure.tight_layout()
+        self.result_figure.canvas.draw()
+        self.result_figure.canvas.flush_events()

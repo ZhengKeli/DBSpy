@@ -2,14 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 
 import dbspy.core as core
-from dbspy.app.main import MainController
-from dbspy.core import Process
-from . import spectrum
+from dbspy.app._main import Controller
+from . import spectrum, analyze
 
 
 class Application:
-    def __init__(self, process: Process = None):
-        self.process: Process = Process() if process is None else process
+    def __init__(self, process: core.Process = None):
+        self.process: core.Process = core.Process() if process is None else process
         
         self.window = tk.Tk()
         self.window.title("PositronSpector")
@@ -29,12 +28,12 @@ class Application:
     
     def init_menu(self):
         self.menu = tk.Menu(self.window)
-
+        
         menu_file = tk.Menu(self.menu, tearoff=0)
         menu_file.add_command(label='New')
         menu_file.add_command(label='Open')
         self.menu.add_cascade(label="File", menu=menu_file)
-
+        
         menu_help = tk.Menu(self.menu, tearoff=0)
         menu_help.add_command(label='About')
         self.menu.add_cascade(label='Help', menu=menu_help)
@@ -54,14 +53,14 @@ class Application:
     def update_tree(self):
         self.tree.delete(*self.tree.get_children())
         main_node = self.tree.insert('', 'end', text='Main', value=['main'], open=True)
-
+        
         for i, spectrum_process in enumerate(self.process.spectrum_processes):
             spectrum_node = self.tree.insert(main_node, 'end', text='Spectrum_' + str(i), value=['spectrum', i])
             self.tree.insert(spectrum_node, 'end', text='raw data', value=['spectrum', i, 'raw'])
             self.tree.insert(spectrum_node, 'end', text='resolution', value=['spectrum', i, 'res'])
             self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
-
+        
         for i, analyze_process in enumerate(self.process.analyze_processes):
             self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['analyze', i])
     
@@ -81,9 +80,9 @@ class Application:
         
         if key is None or len(key) == 0:
             return
-
+        
         if key[0] == 'main':
-            self.controller = MainController(self)
+            self.controller = Controller(self)
         elif key[0] == 'spectrum':
             spectrum_index = key[1]
             spectrum_process = self.process.spectrum_processes[spectrum_index]
@@ -98,10 +97,16 @@ class Application:
                     pass
                 elif key[2] == 'bg':
                     pass  # todo sub items of spectrum
-            pass
+            elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
+                # todo
+                pass
         elif key[0] == 'analyze':
-            #  todo analyze frame
+            analyze_index = key[1]
+            analyze_process = self.process.analyze_processes[analyze_index]
+            if isinstance(analyze_process, core.analyze.sw.Process):
+                self.controller = analyze.sw.Controller(self, analyze_index)
+            # todo ratio
             pass
-
+        
         if self.controller is not None:
             self.controller.frame.pack(side='left', fill='both')

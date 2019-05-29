@@ -1,3 +1,3 @@
 from . import spectrum
 from ._app import Application
-from .main import MainController
+from ._main import Controller
