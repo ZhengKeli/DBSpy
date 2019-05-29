@@ -3,19 +3,19 @@ import numpy as np
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
 from dbspy.utils.indexing import search_nearest, index_nearest
+from dbspy.utils.neighborhood import neighborhood
 from dbspy.utils.variance import add_var, sum_var, divide_var
 
 
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, a_radius=None, s_radius=None, w_radius=None, control_id=None, control_s=None, control_w=None):
-        self.a_radius = a_radius
+    def __init__(self, s_radius=None, w_radius=None, a_radius=None, w_mode=None, tags=None):
         self.s_radius = s_radius
         self.w_radius = w_radius
-        self.control_id = control_id
-        self.control_s = control_s
-        self.control_w = control_w
+        self.a_radius = a_radius
+        self.w_mode = w_mode
+        self.tags = tags
     
     @staticmethod
     def create_process(cluster_block):
@@ -29,59 +29,40 @@ class Process(base.ElementProcess):
 
 def process_func(sp_result_list, conf: Conf):
     sw_list = []
-    control_s_radius = None
-    control_w_radius = None
     for (x, y, var), _ in sp_result_list:
-        sum_y = np.sum(y)
         center_i = np.argmax(y)
         center = x[center_i]
         
-        if conf.a_radius is not None:
-            a_radius = conf.a_radius
-            a_range = center - a_radius, center + a_radius
-            a_range_i = index_nearest(a_range, x)
-        else:
-            a_range_i = 0, len(x)
-        
-        if conf.s_radius is not None:
-            s_radius = conf.s_radius
-        elif conf.control_s is not None:
-            if control_s_radius is None:
-                control_s_radius_i = surround_nearest(y, center_i, conf.control_s * sum_y)
-                control_s_radius = (x[center_i + control_s_radius_i] - x[center_i - control_s_radius_i]) / 2.0
-            s_radius = control_s_radius
-        else:
-            raise TypeError("Can not define s_radius by the conf.")
-        s_range = center - s_radius, center + s_radius
-        s_range_i = index_nearest(s_range, x)
-        
-        if conf.w_radius is not None:
-            w_radius = conf.w_radius
-        elif conf.control_w is not None:
-            if control_w_radius is None:
-                control_w_radius_i = surround_nearest(y, center_i, (1.0 - conf.control_w) * sum_y)
-                control_w_radius = (x[center_i + control_w_radius_i] - x[center_i - control_w_radius_i]) / 2.0
-            w_radius = control_w_radius
-        else:
-            raise TypeError("Can not define w_radius by the conf.")
-        w_range = center - w_radius, center + w_radius
-        w_range_i = index_nearest(w_range, x)
+        s_range_i = index_nearest(neighborhood(center, conf.s_radius), x)
+        w_range_i = index_nearest(neighborhood(center, conf.w_radius), x)
+        a_range_i = (0, len(x)) if conf.a_radius is None \
+            else index_nearest(neighborhood(center, conf.a_radius), x)
         
         s, s_var = rate_var(y, var, *s_range_i)
-        w1, w1_var = rate_var(y, var, a_range_i[0], w_range_i[0])
-        w2, w2_var = rate_var(y, var, w_range_i[1], a_range_i[1])
-        w, w_var = add_var(w1, w1_var, w2, w2_var)
-        
-        sw_list.append((
-            (s, s_var, s_range_i),
-            (w, w_var),
-            (w1, w1_var, (a_range_i[0], w_range_i[0])),
-            (w2, w2_var, (w_range_i[1], a_range_i[1])),
-        ))
-    return tuple(sw_list)
+        w, w_var, w_range_i = compute_w(y, var, w_range_i, a_range_i, conf.w_mode)
+        sw_list.append(((s, s_var, s_range_i), (w, w_var, w_range_i)))
+    return tuple((ss, ww, tag) for (ss, ww), tag in zip(sw_list, conf.tags))
 
 
 # utils
+
+def compute_w(y, var, w_range_i, a_range_i, w_mode):
+    if w_mode == 'left':
+        wl_range_i = a_range_i[0], w_range_i[0]
+        wl, wl_var = rate_var(y, var, *wl_range_i)
+        return wl, wl_var, wl_range_i
+    elif w_mode == 'right':
+        wr_range_i = w_range_i[1], a_range_i[1]
+        wr, wr_var = rate_var(y, var, *wr_range_i)
+        return wr, wr_var, wr_range_i
+    elif w_mode == 'all' or w_mode is None:
+        wl, wl_var, wl_range_i = compute_w(y, var, w_range_i, a_range_i, 'left')
+        wr, wr_var, wr_range_i = compute_w(y, var, w_range_i, a_range_i, 'right')
+        w, w_var = add_var(wl, wl_var, wr, wr_var)
+        return w, w_var, (wl_range_i, wr_range_i)
+    else:
+        raise TypeError("Unsupported w_mode: " + w_mode)
+
 
 def surround_nearest(ys, center_i, s):
     nearest_radius_i, _ = search_nearest(
