@@ -1,7 +1,7 @@
 import numpy as np
 
 from dbspy.core import base
-from dbspy.utils.spectrum import Spectrum
+from dbspy.utils.indexing import index_nearest
 
 
 # define
@@ -20,35 +20,35 @@ class Process(base.ElementProcess):
 
 
 def process_func(raw_result, peak_res, conf: Conf):
-    raw_sp = Spectrum(*raw_result)
+    raw_x, raw_y = raw_result
     peak_range_i, _, peak_center_i = peak_res
     
     if conf.range is not None:
         bg_range = conf.range
-        bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
+        bg_range_i = index_nearest(bg_range, raw_x)
     elif conf.radius is not None:
-        peak_center = raw_sp.x[peak_center_i + peak_range_i[0]]
+        peak_center = raw_x[peak_center_i + peak_range_i[0]]
         bg_range = (peak_center - conf.radius, peak_center + conf.radius)
-        bg_range_i = raw_sp.index(bg_range[0]), raw_sp.index(bg_range[1])
+        bg_range_i = index_nearest(bg_range, raw_x)
     else:
         bg_range_i = peak_range_i
-        bg_range = raw_sp.x[peak_range_i[0]], raw_sp.x[peak_range_i[1]]
+        bg_range = raw_x[bg_range_i[0]], raw_x[bg_range_i[1]]
     
     bg_expand = 0.0 if conf.bg_expand is None else conf.bg_expand
     if isinstance(bg_expand, float) or isinstance(bg_expand, int):
         bg_expand = [bg_expand, bg_expand]
     
     expanded_range = bg_range[0] - bg_expand[0], bg_range[1] + bg_expand[1]
-    ex_range_i = raw_sp.index(expanded_range[0]), raw_sp.index(expanded_range[1])
+    ex_range_i = index_nearest(expanded_range, raw_x)
     
     bg_algorithm = conf.bg_algorithm
     if bg_algorithm == 'volumeLinear' or bg_algorithm is None:
-        bg_y = volume_linear_bg(raw_sp.y, *bg_range_i, *ex_range_i)
-        bg_spectrum = Spectrum(raw_sp.x[slice(*bg_range_i)], bg_y)
+        bg_y = volume_linear_bg(raw_y, *bg_range_i, *ex_range_i)
+        bg_x = raw_x[slice(*bg_range_i)]
     else:
         raise TypeError(f"not supported bg_type:{type(conf)}")
     
-    return bg_range_i, bg_spectrum
+    return bg_range_i, (bg_x, bg_y)
 
 
 # utils

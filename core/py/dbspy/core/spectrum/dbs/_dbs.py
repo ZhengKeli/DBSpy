@@ -3,7 +3,6 @@ import numpy as np
 from dbspy.core import base
 from dbspy.core.spectrum import _spectrum as spectrum
 from dbspy.utils.block import FunctionBlock
-from dbspy.utils.spectrum import Spectrum
 from . import bg, peak, raw, res
 
 
@@ -70,12 +69,14 @@ def integrate_func(res_result, peak_result, bg_result):
 
 # utils
 
-def subtract_bg(peak_range_i, peak_spectrum: Spectrum, bg_range_i, bg_spectrum: Spectrum) -> Spectrum:
+def subtract_bg(peak_range_i, peak_spectrum, bg_range_i, bg_spectrum):
+    peak_x, peak_y, peak_var = peak_spectrum
+    _, bg_y = bg_spectrum
+    
     padding = max(bg_range_i[0] - peak_range_i[0], 0), max(peak_range_i[1] - bg_range_i[1], 0)
     cropping = max(peak_range_i[0] - bg_range_i[0], 0), max(bg_range_i[1] - peak_range_i[1], 0)
     
-    bg_y = bg_spectrum.y
     bg_y = np.pad(bg_y, padding, 'edge')
     bg_y = bg_y[cropping[0]:len(bg_y) - cropping[1]]
     
-    return Spectrum(peak_spectrum.x, peak_spectrum.y - bg_y, peak_spectrum.var)
+    return peak_x, peak_y - bg_y, peak_var

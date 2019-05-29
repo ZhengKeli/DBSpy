@@ -2,7 +2,7 @@ import numpy as np
 from scipy import ndimage
 
 from dbspy.core import base
-from dbspy.utils.spectrum import Spectrum
+from dbspy.utils.indexing import index_nearest
 from dbspy.utils.variance import spectrum_var
 
 
@@ -23,8 +23,8 @@ class Process(base.ElementProcess):
 
 
 def process_func(raw_result, conf: Conf):
-    sp = Spectrum(*raw_result)
-    sp.var = spectrum_var(sp.y)
+    x, y = raw_result
+    y_var = spectrum_var(y)
     
     if conf.search_range is not None:
         search_range = conf.search_range
@@ -42,21 +42,23 @@ def process_func(raw_result, conf: Conf):
     
     if conf.peak_center is not None:
         peak_center = conf.peak_center
-        peak_center_i = sp.index(peak_center)
+        peak_center_i = index_nearest(peak_center, x)
     elif search_range is not None:
-        y_blur = ndimage.gaussian_filter1d(sp.y, 3.0)
-        peak_center_i = search_peak_center_i(y_blur, sp.index(search_range[0]), sp.index(search_range[1]))
-        peak_center = sp.x[peak_center_i]
+        y_blur = ndimage.gaussian_filter1d(y, 3.0)
+        peak_center_i = search_peak_center_i(y_blur, *index_nearest(search_range, x))
+        peak_center = x[peak_center_i]
     else:
         raise RuntimeError("Cannot define the index of peak center.")
     
     peak_range = (peak_center - peak_radius, peak_center + peak_radius)
-    peak_range_i = sp.index(peak_range[0]), sp.index(peak_range[1])
-
-    peak_spectrum = sp[slice(*peak_range_i)]
+    peak_range_i = index_nearest(peak_range, x)
+    
+    peak_x = x[slice(*peak_range_i)]
+    peak_y = y[slice(*peak_range_i)]
+    peak_y_var = y_var[slice(*peak_range_i)]
     peak_center_i -= peak_range_i[0]
-
-    return peak_range_i, peak_spectrum, peak_center_i
+    
+    return peak_range_i, (peak_x, peak_y, peak_y_var), peak_center_i
 
 
 # utils

@@ -17,17 +17,14 @@ class Process(base.ElementProcess):
 
 
 def process_func(raw_result, conf: Conf) -> float:
-    peak_range_i, peak_spectrum, peak_center_i = peak.process_func(raw_result, conf)
-    resolution = compute_resolution(peak_range_i, peak_center_i + peak_range_i[0], peak_spectrum)
+    peak_range_i, (peak_x, peak_y, _), peak_center_i = peak.process_func(raw_result, conf)
+    resolution = compute_resolution(peak_x, peak_y, peak_center_i)
     return resolution
 
 
 # utils
 
-def compute_resolution(peak_range_i, peak_center_i, peak_spectrum):
-    xs = peak_spectrum.x
-    xs = xs - xs[peak_center_i - peak_range_i[0]]
-    ys = peak_spectrum.y
-    points = np.stack((xs, ys), 1)
+def compute_resolution(x, y, peak_i):
+    points = np.stack((x - x[peak_i], y), 1)
     resolution = gaussian_fwhm(gaussian_fit(points))
     return resolution

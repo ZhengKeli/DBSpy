@@ -1,11 +1,8 @@
-from typing import Iterable
-
 import numpy as np
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
-from dbspy.utils.indexing import search_nearest
-from dbspy.utils.spectrum import Spectrum
+from dbspy.utils.indexing import search_nearest, index_nearest
 from dbspy.utils.variance import add_var, sum_var, divide_var
 
 
@@ -30,50 +27,49 @@ class Process(base.ElementProcess):
         super().__init__(process_func, Conf(), cluster_block)
 
 
-def process_func(sp_result_list: Iterable[Spectrum], conf: Conf):
+def process_func(sp_result_list, conf: Conf):
     sw_list = []
     control_s_radius = None
     control_w_radius = None
-    for sp, _ in sp_result_list:
-        sum_ys = np.sum(sp.y)
-        
-        center_i = np.argmax(sp.y)
-        center = sp.x[center_i]
+    for (x, y, var), _ in sp_result_list:
+        sum_y = np.sum(y)
+        center_i = np.argmax(y)
+        center = x[center_i]
         
         if conf.a_radius is not None:
             a_radius = conf.a_radius
             a_range = center - a_radius, center + a_radius
-            a_range_i = sp.index(a_range)
+            a_range_i = index_nearest(a_range, x)
         else:
-            a_range_i = 0, len(sp)
+            a_range_i = 0, len(x)
         
         if conf.s_radius is not None:
             s_radius = conf.s_radius
         elif conf.control_s is not None:
             if control_s_radius is None:
-                control_s_radius_i = surround_nearest(sp.y, center_i, conf.control_s * sum_ys)
-                control_s_radius = (sp.x[center_i + control_s_radius_i] - sp.x[center_i - control_s_radius_i]) / 2.0
+                control_s_radius_i = surround_nearest(y, center_i, conf.control_s * sum_y)
+                control_s_radius = (x[center_i + control_s_radius_i] - x[center_i - control_s_radius_i]) / 2.0
             s_radius = control_s_radius
         else:
             raise TypeError("Can not define s_radius by the conf.")
         s_range = center - s_radius, center + s_radius
-        s_range_i = sp.index(s_range)
+        s_range_i = index_nearest(s_range, x)
         
         if conf.w_radius is not None:
             w_radius = conf.w_radius
         elif conf.control_w is not None:
             if control_w_radius is None:
-                control_w_radius_i = surround_nearest(sp.y, center_i, (1.0 - conf.control_w) * sum_ys)
-                control_w_radius = (sp.x[center_i + control_w_radius_i] - sp.x[center_i - control_w_radius_i]) / 2.0
+                control_w_radius_i = surround_nearest(y, center_i, (1.0 - conf.control_w) * sum_y)
+                control_w_radius = (x[center_i + control_w_radius_i] - x[center_i - control_w_radius_i]) / 2.0
             w_radius = control_w_radius
         else:
             raise TypeError("Can not define w_radius by the conf.")
         w_range = center - w_radius, center + w_radius
-        w_range_i = sp.index(w_range)
+        w_range_i = index_nearest(w_range, x)
         
-        s, s_var = rate_var(sp.y, sp.var, *s_range_i)
-        w1, w1_var = rate_var(sp.y, sp.var, a_range_i[0], w_range_i[0])
-        w2, w2_var = rate_var(sp.y, sp.var, w_range_i[1], a_range_i[1])
+        s, s_var = rate_var(y, var, *s_range_i)
+        w1, w1_var = rate_var(y, var, a_range_i[0], w_range_i[0])
+        w2, w2_var = rate_var(y, var, w_range_i[1], a_range_i[1])
         w, w_var = add_var(w1, w1_var, w2, w2_var)
         
         sw_list.append((
