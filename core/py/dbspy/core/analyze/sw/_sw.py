@@ -10,11 +10,11 @@ from dbspy.utils.variance import add_var, sum_var, divide_var
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, s_radius=None, w_radius=None, a_radius=None, mode=None):
+    def __init__(self, s_radius=None, w_radius=None, a_radius=None, w_mode=None):
         self.s_radius = s_radius
         self.w_radius = w_radius
         self.a_radius = a_radius
-        self.mode = mode
+        self.w_mode = w_mode
     
     @staticmethod
     def create_process(cluster_block):
@@ -28,7 +28,7 @@ class Process(base.ElementProcess):
 
 def process_func(sp_result_list, conf: Conf):
     return tuple(
-        compute_sw(x, y, var, conf.s_radius, conf.w_radius, conf.a_radius, conf.mode)
+        compute_sw(x, y, var, conf.s_radius, conf.w_radius, conf.a_radius, conf.w_mode)
         for (x, y, var), _ in sp_result_list)
 
 
