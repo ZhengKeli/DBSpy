@@ -15,7 +15,7 @@ class Controller(base.ElementProcessController):
         super().__init__(app.container, app.process.spectrum_processes[index].raw_process)
     
     def on_create_info_frame(self, info_frame):
-        tk.Label(info_frame, text='Raw Data').pack(anchor='w')
+        tk.Label(info_frame, text='Raw Data').pack()
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='File path:').pack(anchor='w')
@@ -26,7 +26,7 @@ class Controller(base.ElementProcessController):
         canvas.draw()
         toolbar = NavigationToolbar2Tk(canvas, result_frame)
         toolbar.update()
-        canvas.get_tk_widget().pack(anchor='w', fill='both')
+        canvas.get_tk_widget().pack()
     
     def on_reset(self, conf: Conf):
         self.conf_file_path.set(str(conf.file_path))
