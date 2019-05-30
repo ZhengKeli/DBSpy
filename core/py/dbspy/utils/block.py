@@ -44,8 +44,8 @@ class FunctionBlock(Block):
         valid = (self._buffer_versions is not None) and all(
             b == l for b, l in zip(self._buffer_versions, latest_arg_versions))
         if not valid:
-            self._buffer_versions = latest_arg_versions
             self.value = self.func(*latest_arg_values)
+            self._buffer_versions = latest_arg_versions
     
     @Block.value.getter
     def value(self):
