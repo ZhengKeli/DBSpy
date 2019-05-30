@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from dbspy.app import base
 from dbspy.core.analyze.sw import Conf
+from dbspy.gui import base
 
 
 class Controller(base.ElementProcessController):

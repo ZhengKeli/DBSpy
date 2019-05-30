@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import dbspy.core as core
-from dbspy.app._main import Controller
+from dbspy.gui._main import Controller
 from . import spectrum, analyze
 
 

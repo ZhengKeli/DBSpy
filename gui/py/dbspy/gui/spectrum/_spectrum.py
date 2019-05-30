@@ -3,7 +3,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from dbspy.app import base
+from dbspy.gui import base
 
 
 class Controller(base.ProcessController):

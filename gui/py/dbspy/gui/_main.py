@@ -1,7 +1,7 @@
 import tkinter as tk
 
 import dbspy.core as core
-from dbspy.app import base
+from dbspy.gui import base
 
 
 class Controller(base.ProcessController):
