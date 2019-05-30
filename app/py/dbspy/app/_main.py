@@ -1,41 +1,43 @@
 import tkinter as tk
 
 import dbspy.core as core
-from dbspy.app.base import BaseController
-from dbspy.core import Process
+from dbspy.app import base
 
 
-class Controller(BaseController):
+class Controller(base.ProcessController):
     def __init__(self, app):
-        super().__init__(app)
-        self.process: Process = app.process
-        
+        self.app = app
         self.spectrum_text = tk.StringVar()
         self.analyze_text = tk.StringVar()
-        
-        tk.Label(self.frame, textvariable=self.spectrum_text).pack(anchor='w')
-        tk.Button(self.frame, text='New spectrum DBS', command=self.on_new_spectrum_dbs).pack(anchor='w')
-        tk.Button(self.frame, text='New spectrum CDBS', command=self.on_new_spectrum_cdbs).pack(anchor='w')
-        
-        tk.Label(self.frame, textvariable=self.analyze_text).pack(anchor='w', pady='10p 0')
-        tk.Button(self.frame, text='New analyze SW', command=self.on_new_analyze_sw).pack(anchor='w')
-        tk.Button(self.frame, text='New analyze Ratio', command=self.on_new_analyze_ratio).pack(anchor='w')
-        
-        self.reset()
+        super().__init__(app.container, app.process)
     
-    def reset(self):
+    def on_create_info_frame(self, info_frame):
+        pass
+    
+    def on_create_result_frame(self, result_frame):
+        tk.Label(result_frame, textvariable=self.spectrum_text).pack(anchor='w')
+        tk.Button(result_frame, text='New spectrum DBS', command=self.on_new_spectrum_dbs).pack(anchor='w')
+        tk.Button(result_frame, text='New spectrum CDBS', command=self.on_new_spectrum_cdbs).pack(anchor='w')
+        
+        tk.Label(result_frame, textvariable=self.analyze_text).pack(anchor='w', pady='10p 0')
+        tk.Button(result_frame, text='New analyze SW', command=self.on_new_analyze_sw).pack(anchor='w')
+        tk.Button(result_frame, text='New analyze Ratio', command=self.on_new_analyze_ratio).pack(anchor='w')
+    
+    def on_update(self, result, exception):
         spectrum_len = len(self.process.spectrum_processes)
-        self.spectrum_text.set(f'You have {spectrum_len} spectrums.')
+        self.spectrum_text.set(f'You have {spectrum_len} spectrum.')
         analyze_len = len(self.process.analyze_processes)
         self.analyze_text.set(f'You have {analyze_len} analyzes.')
     
     def on_new_spectrum_dbs(self):
-        new_spectrum_process = core.spectrum.dbs.Process()
+        tag = '#' + str(len(self.process.spectrum_processes))
+        new_spectrum_process = core.spectrum.dbs.Process(tag)
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     
     def on_new_spectrum_cdbs(self):
-        new_spectrum_process = core.spectrum.cdbs.Process()
+        tag = '#' + str(len(self.process.spectrum_processes))
+        new_spectrum_process = core.spectrum.cdbs.Process(tag)
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     

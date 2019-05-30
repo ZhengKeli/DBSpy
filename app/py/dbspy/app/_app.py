@@ -11,9 +11,10 @@ class Application:
         self.process: core.Process = core.Process() if process is None else process
         
         self.window = tk.Tk()
-        self.window.title("PositronSpector")
+        self.window.title("DBSpy")
         
         self.menu = None
+        self.key = None
         self.init_menu()
         
         self.tree = None
@@ -55,14 +56,16 @@ class Application:
         main_node = self.tree.insert('', 'end', text='Main', value=['main'], open=True)
         
         for i, spectrum_process in enumerate(self.process.spectrum_processes):
-            spectrum_node = self.tree.insert(main_node, 'end', text='Spectrum_' + str(i), value=['spectrum', i])
+            tag = str(spectrum_process.tag)
+            spectrum_node = self.tree.insert(main_node, 'end', text='Spectrum ' + tag, value=['spectrum', i])
             self.tree.insert(spectrum_node, 'end', text='raw data', value=['spectrum', i, 'raw'])
             self.tree.insert(spectrum_node, 'end', text='resolution', value=['spectrum', i, 'res'])
             self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
         
         for i, analyze_process in enumerate(self.process.analyze_processes):
-            self.tree.insert(main_node, 'end', text='Analyze_' + str(i), value=['analyze', i])
+            tag = {core.analyze.sw.Process: 'SW', core.analyze.ratio.Process: 'Ratio'}[type(analyze_process)]
+            self.tree.insert(main_node, 'end', text='Analyze ' + tag, value=['analyze', i])
     
     def on_tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
@@ -74,6 +77,9 @@ class Application:
         self.update_frame(['main'])
     
     def update_frame(self, key=None):
+        if self.key == key:
+            return
+        
         self.controller = None
         for child in self.container.winfo_children():
             child.destroy()
@@ -108,5 +114,4 @@ class Application:
             # todo ratio
             pass
         
-        if self.controller is not None:
-            self.controller.frame.pack(side='left', fill='both')
+        self.key = key
