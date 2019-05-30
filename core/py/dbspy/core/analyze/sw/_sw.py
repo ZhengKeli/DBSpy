@@ -10,12 +10,11 @@ from dbspy.utils.variance import add_var, sum_var, divide_var
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, s_radius=None, w_radius=None, a_radius=None, w_mode=None, tags=None):
+    def __init__(self, s_radius=None, w_radius=None, a_radius=None, w_mode=None):
         self.s_radius = s_radius
         self.w_radius = w_radius
         self.a_radius = a_radius
         self.w_mode = w_mode
-        self.tags = tags
     
     @staticmethod
     def create_process(cluster_block):
@@ -28,23 +27,26 @@ class Process(base.ElementProcess):
 
 
 def process_func(sp_result_list, conf: Conf):
-    sw_list = []
-    for (x, y, var), _ in sp_result_list:
-        center_i = np.argmax(y)
-        center = x[center_i]
-        
-        s_range_i = index_nearest(neighborhood(center, conf.s_radius), x)
-        w_range_i = index_nearest(neighborhood(center, conf.w_radius), x)
-        a_range_i = (0, len(x)) if conf.a_radius is None \
-            else index_nearest(neighborhood(center, conf.a_radius), x)
-        
-        s, s_var = rate_var(y, var, *s_range_i)
-        w, w_var, w_range_i = compute_w(y, var, w_range_i, a_range_i, conf.w_mode)
-        sw_list.append(((s, s_var, s_range_i), (w, w_var, w_range_i)))
-    return tuple((ss, ww, tag) for (ss, ww), tag in zip(sw_list, conf.tags))
+    return tuple(
+        compute_sw(x, y, var, conf.s_radius, conf.w_radius, conf.a_radius, conf.w_mode)
+        for (x, y, var), _ in sp_result_list)
 
 
 # utils
+
+def compute_sw(x, y, var, s_radius, w_radius, a_radius, w_mode):
+    center_i = np.argmax(y)
+    center = x[center_i]
+    
+    s_range_i = index_nearest(neighborhood(center, s_radius), x)
+    w_range_i = index_nearest(neighborhood(center, w_radius), x)
+    a_range_i = (0, len(x)) if a_radius is None \
+        else index_nearest(neighborhood(center, a_radius), x)
+    
+    s, s_var = rate_var(y, var, *s_range_i)
+    w, w_var, w_range_i = compute_w(y, var, w_range_i, a_range_i, w_mode)
+    return (s, s_var, s_range_i), (w, w_var, w_range_i)
+
 
 def compute_w(y, var, w_range_i, a_range_i, w_mode):
     if w_mode == 'left':

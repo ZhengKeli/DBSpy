@@ -1,6 +1,5 @@
 import numpy as np
 
-from dbspy.core import base
 from dbspy.core.spectrum import _spectrum as spectrum
 from dbspy.utils.block import FunctionBlock
 from . import bg, peak, raw, res
@@ -8,15 +7,15 @@ from . import bg, peak, raw, res
 
 # define
 class Conf(spectrum.Conf):
-    def __init__(self, raw_conf=None, res_conf=None, peak_conf=None, bg_conf=None):
+    def __init__(self, tag=None, raw_conf=None, res_conf=None, peak_conf=None, bg_conf=None):
+        super().__init__(tag)
         self.raw = raw_conf
         self.res = res_conf
         self.peak = peak_conf
         self.bg = bg_conf
     
-    @staticmethod
-    def create_process():
-        return Process()
+    def create_process(self):
+        return Process(self.tag)
     
     def encode_content(self):
         return {
@@ -34,8 +33,8 @@ class Conf(spectrum.Conf):
             bg.Conf.decode(code['bg']))
 
 
-class Process(base.Process):
-    def __init__(self):
+class Process(spectrum.Process):
+    def __init__(self, tag):
         self.raw_process = raw.Process()
         self.res_process = res.Process(self.raw_process)
         self.peak_process = peak.Process(self.raw_process)
@@ -45,14 +44,20 @@ class Process(base.Process):
             self.res_process.block,
             self.peak_process.block,
             self.bg_process.block)
-        super().__init__(integrate_block)
+        super().__init__(integrate_block, tag)
     
     @property
     def conf(self) -> Conf:
-        return Conf(self.raw_process.conf, self.res_process.conf, self.peak_process.conf, self.bg_process.conf)
+        return Conf(
+            self.tag,
+            self.raw_process.conf,
+            self.res_process.conf,
+            self.peak_process.conf,
+            self.bg_process.conf)
     
     @conf.setter
     def conf(self, conf: Conf):
+        self.tag = conf.tag
         self.raw_process.conf = conf.raw
         self.res_process.conf = conf.res
         self.peak_process.conf = conf.peak

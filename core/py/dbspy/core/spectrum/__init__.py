@@ -1,2 +1,2 @@
 from . import dbs, cdbs
-from ._spectrum import Conf
+from ._spectrum import Conf, Process
