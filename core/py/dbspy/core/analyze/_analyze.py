@@ -16,8 +16,8 @@ class Conf(base.Conf, abc.ABC):
         return process
     
     def encode(self) -> dict:
-        from . import sw, ratio
-        t = {sw.Conf: 'sw', ratio.Conf: 'ratio'}[type(self)]
+        from . import sw, curve
+        t = {sw.Conf: 'sw', curve.Conf: 'curve'}[type(self)]
         return {
             'type': t,
             **self.encode_content()
@@ -25,8 +25,8 @@ class Conf(base.Conf, abc.ABC):
     
     @classmethod
     def decode(cls, code):
-        from . import sw, ratio
-        c = {'sw': sw.Conf, 'ratio': ratio.Conf}[code['type']]
+        from . import sw, curve
+        c = {'sw': sw.Conf, 'curve': curve.Conf}[code['type']]
         content_code = code.copy()
         del content_code['type']
         return c.decode_content(content_code)

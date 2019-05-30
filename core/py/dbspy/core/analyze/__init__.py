@@ -1,2 +1,2 @@
-from . import sw, ratio
+from . import sw, curve
 from ._analyze import Conf

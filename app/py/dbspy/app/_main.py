@@ -21,7 +21,7 @@ class Controller(base.ProcessController):
         
         tk.Label(result_frame, textvariable=self.analyze_text).pack(anchor='w', pady='10p 0')
         tk.Button(result_frame, text='New analyze SW', command=self.on_new_analyze_sw).pack(anchor='w')
-        tk.Button(result_frame, text='New analyze Ratio', command=self.on_new_analyze_ratio).pack(anchor='w')
+        tk.Button(result_frame, text='New analyze Curve', command=self.on_new_analyze_curve).pack(anchor='w')
     
     def on_update(self, result, exception):
         spectrum_len = len(self.process.spectrum_processes)
@@ -46,7 +46,7 @@ class Controller(base.ProcessController):
         self.process.append_analyze_process(new_analyze_process)
         self.app.update_tree()
     
-    def on_new_analyze_ratio(self):
-        new_analyze_process = core.analyze.ratio.Process(self.process.spectrum_cluster_block)
+    def on_new_analyze_curve(self):
+        new_analyze_process = core.analyze.curve.Process(self.process.spectrum_cluster_block)
         self.process.append_analyze_process(new_analyze_process)
         self.app.update_tree()

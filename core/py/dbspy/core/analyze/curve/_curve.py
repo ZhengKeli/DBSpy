@@ -28,11 +28,11 @@ def process_func(sp_result_list, conf: Conf):
     sp_list = tuple(fold_sp(sp, center_i, conf.fold_mode) for sp in sp_list)
     ys_list, ys_var_list = zip(*((sp_fold[:, 1], sp_fold[:, 2]) for sp_fold in sp_list))
     ys_list, ys_var_list = normalize(ys_list, ys_var_list)
-    ratio_list, ratio_var_list = compute_ratio(ys_list, ys_var_list, conf.compare_mode)
-    ratio_sp_list = tuple(
-        (sp[:, 0], ratio, ratio_var)
-        for sp, ratio, ratio_var in zip(sp_list, ratio_list, ratio_var_list))
-    return ratio_sp_list
+    curve_list, curve_var_list = compute_curve(ys_list, ys_var_list, conf.compare_mode)
+    curve_sp_list = tuple(
+        (sp[:, 0], curve, curve_var)
+        for sp, curve, curve_var in zip(sp_list, curve_list, curve_var_list))
+    return curve_sp_list
 
 
 # utils
@@ -88,19 +88,19 @@ def normalize(ys_list, ys_var_list, control_ys=None, control_ys_var=None):
     return norm_ys_list, norm_ys_var_list
 
 
-def compute_ratio(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
+def compute_curve(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
     control_ys = ys_list[0] if control_ys is None else control_ys
     control_ys_var = ys_var_list[0] if control_ys_var is None else control_ys_var
-    ratio_list, ratio_var_list = [], []
+    curve_list, curve_var_list = [], []
     for i in range(len(ys_list)):
         ys = ys_list[i]
         ys_var = ys_var_list[i]
-        if compare_mode == 'subtract' or compare_mode is None:
-            ratio, ratio_var = minus_var(ys, ys_var, control_ys, control_ys_var)
-        elif compare_mode == 'divide':
-            ratio, ratio_var = divide_var(ys, ys_var, control_ys, control_ys_var)
+        if compare_mode in ('difference', 'subtract', None):
+            curve, curve_var = minus_var(ys, ys_var, control_ys, control_ys_var)
+        elif compare_mode in ('ratio', 'divide'):
+            curve, curve_var = divide_var(ys, ys_var, control_ys, control_ys_var)
         else:
             raise TypeError(f"Unsupported compare mode {compare_mode}")
-        ratio_list.append(ratio)
-        ratio_var_list.append(ratio_var)
-    return ratio_list, ratio_var_list
+        curve_list.append(curve)
+        curve_var_list.append(curve_var)
+    return curve_list, curve_var_list

@@ -64,7 +64,7 @@ class Application:
             self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
         
         for i, analyze_process in enumerate(self.process.analyze_processes):
-            tag = {core.analyze.sw.Process: 'SW', core.analyze.ratio.Process: 'Ratio'}[type(analyze_process)]
+            tag = {core.analyze.sw.Process: 'SW', core.analyze.curve.Process: 'Curve'}[type(analyze_process)]
             self.tree.insert(main_node, 'end', text='Analyze ' + tag, value=['analyze', i])
     
     def on_tree_clicked(self, _):
@@ -111,7 +111,7 @@ class Application:
             analyze_process = self.process.analyze_processes[analyze_index]
             if isinstance(analyze_process, core.analyze.sw.Process):
                 self.controller = analyze.sw.Controller(self, analyze_index)
-            # todo ratio
+            # todo curve
             pass
         
         self.key = key
