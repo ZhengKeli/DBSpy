@@ -2,7 +2,7 @@ import numpy as np
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
-from dbspy.utils.variance import add_var, minus_var, divide_var, times_var, sum_var
+from dbspy.utils.variance import add_var, minus_var, divide_var, sum_var
 
 
 # define
@@ -23,84 +23,75 @@ class Process(base.ElementProcess):
 
 
 def process_func(sp_result_list, conf: Conf):
-    sp_list = tuple(np.transpose(sp) for sp, _ in sp_result_list)
-    sp_list, center_i = align_peak(sp_list)
-    sp_list = tuple(fold_sp(sp, center_i, conf.fold_mode) for sp in sp_list)
-    ys_list, ys_var_list = zip(*((sp_fold[:, 1], sp_fold[:, 2]) for sp_fold in sp_list))
-    ys_list, ys_var_list = normalize(ys_list, ys_var_list)
-    curve_list, curve_var_list = compute_curve(ys_list, ys_var_list, conf.compare_mode)
-    curve_sp_list = tuple(
-        (sp[:, 0], curve, curve_var)
-        for sp, curve, curve_var in zip(sp_list, curve_list, curve_var_list))
-    return curve_sp_list
+    sp_list = tuple(np.array(sp) for sp, _ in sp_result_list)
+    x, yv_list, center_i = align_list(sp_list)
+    x, yv_list = fold_list(x, yv_list, center_i, conf.fold_mode)
+    yv_list = tuple(divide_var(y, y_var, *sum_var(y, y_var)) for y, y_var in yv_list)
+    yv_list = compare_list(yv_list, conf.compare_mode)
+    return tuple((x, y, y_var) for y, y_var in yv_list)
 
 
 # utils
 
-def align_peak(sp_list):
-    center_i_list = tuple(np.argmax(sp[:, 1]) for sp in sp_list)
+def align_list(sp_list, control_index=0):
+    # todo recode if the x is not the same
+    
+    center_i_list = tuple(np.argmax(sp[1, :]) for sp in sp_list)
     center_i_min = min(center_i_list)
-    sp_list = tuple(sp_list[i][center_i_list[i] - center_i_min:] for i in range(len(sp_list)))
+    sp_list = tuple(sp_list[i][:, center_i_list[i] - center_i_min:] for i in range(len(sp_list)))
     
-    len_list = tuple(len(sp) for sp in sp_list)
+    len_list = tuple(np.shape(sp)[1] for sp in sp_list)
     len_min = min(len_list)
-    sp_list = tuple(sp[:len_min] for sp in sp_list)
     
-    return sp_list, center_i_min
+    x = sp_list[control_index][0][:len_min]
+    yv_list = tuple((y[:len_min], y_var[:len_min]) for _, y, y_var in sp_list)
+    
+    return x, yv_list, center_i_min
 
 
-def fold_sp(sp, center_i, mode):
+def fold_list(x, yv_list, center_i, mode):
+    yv_list = np.array(yv_list)
     if mode == 'none' or mode is None:
-        return sp
+        return x, yv_list
     elif mode == 'left':
-        center = sp[center_i, 0]
-        sp_left = np.copy(sp[:center_i + 1])
-        sp_left[:, 0] = center - sp_left[:, 0]
-        return np.flip(sp_left)
+        x_left = x[center_i] - x[:center_i + 1]
+        yv_left_list = yv_list[:, :, :center_i + 1]
+        return np.flip(x_left), np.flip(yv_left_list, 2)
     elif mode == 'right':
-        center = sp[center_i, 0]
-        sp_right = np.copy(sp[center_i:])
-        sp_right[:, 0] -= center
-        return sp_right
+        x_right = x[center_i:] - x[center_i]
+        yv_right_list = yv_list[:, :, center_i:]
+        return x_right, yv_right_list
     elif mode == 'fold':
-        sp_left = fold_sp(sp, center_i, 'left')
-        sp_right = fold_sp(sp, center_i, 'right')
-        len_min = min(len(sp_left), len(sp_right))
-        sp_left = sp_left[:len_min]
-        sp_right = sp_right[:len_min]
-        ys, ys_var = add_var(sp_left[:, 1], sp_left[:, 2], sp_right[:, 1], sp_right[:, 2])
-        return np.transpose((sp_right[:, 0], ys, ys_var))
+        x_left, yv_left_list = fold_list(x, yv_list, center_i, 'left')
+        x_right, yv_right_list = fold_list(x, yv_list, center_i, 'right')
+        len_min = min(len(x_left), len(x_right))
+        
+        x = x_right[:len_min]
+        yv_left_list = yv_left_list[:, :, :len_min]
+        yv_right_list = yv_right_list[:, :, :len_min]
+        yv_list = np.transpose(add_var(
+            *yv_left_list.transpose([1, 0, 2]),
+            *yv_right_list.transpose([1, 0, 2])
+        ), [1, 0, 2])
+        return x, yv_list
     else:
         raise TypeError("Unsupported fold mode")
 
 
-def normalize(ys_list, ys_var_list, control_ys=None, control_ys_var=None):
-    control_ys = ys_list[0] if control_ys is None else control_ys
-    control_ys_var = ys_var_list[0] if control_ys_var is None else control_ys_var
-    control_sum, control_sum_var = sum_var(control_ys, control_ys_var)
-    norm_ys_list, norm_ys_var_list = [], []
-    for ys, ys_var in zip(ys_list, ys_var_list):
-        ys_sum, ys_sum_var = sum_var(ys, ys_var)
-        scale, scale_var = divide_var(control_sum, control_sum_var, ys_sum, ys_sum_var)
-        norm_ys, norm_ys_var = times_var(ys, ys_var, scale, scale_var)
-        norm_ys_list.append(norm_ys)
-        norm_ys_var_list.append(norm_ys_var)
-    return norm_ys_list, norm_ys_var_list
+def compare_list(yv_list, compare_mode, control_index=0):
+    control_yv = None if control_index is None else yv_list[control_index]
+    return list(compare_yv(yv, control_yv, compare_mode, i == control_index) for i, yv in enumerate(yv_list))
 
 
-def compute_curve(ys_list, ys_var_list, compare_mode, control_ys=None, control_ys_var=None):
-    control_ys = ys_list[0] if control_ys is None else control_ys
-    control_ys_var = ys_var_list[0] if control_ys_var is None else control_ys_var
-    curve_list, curve_var_list = [], []
-    for i in range(len(ys_list)):
-        ys = ys_list[i]
-        ys_var = ys_var_list[i]
-        if compare_mode in ('difference', 'subtract', None):
-            curve, curve_var = minus_var(ys, ys_var, control_ys, control_ys_var)
-        elif compare_mode in ('ratio', 'divide'):
-            curve, curve_var = divide_var(ys, ys_var, control_ys, control_ys_var)
-        else:
-            raise TypeError(f"Unsupported compare mode {compare_mode}")
-        curve_list.append(curve)
-        curve_var_list.append(curve_var)
-    return curve_list, curve_var_list
+def compare_yv(yv, control_yv, compare_mode, ignore_var=False):
+    y, y_var = yv
+    if compare_mode in ('difference', 'subtract', None):
+        control_y, control_y_var = (0, 0) if control_yv is None else control_yv
+        c, c_var = minus_var(y, y_var, control_y, control_y_var)
+    elif compare_mode in ('ratio', 'divide'):
+        control_y, control_y_var = (1, 0) if control_yv is None else control_yv
+        c, c_var = divide_var(y, y_var, control_y, control_y_var)
+    else:
+        raise TypeError(f"Unsupported compare mode {compare_mode}")
+    c_var = np.zeros_like(c_var) if ignore_var else c_var
+    return c, c_var
