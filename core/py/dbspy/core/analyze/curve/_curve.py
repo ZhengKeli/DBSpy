@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.optimize as opt
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
@@ -8,9 +9,13 @@ from dbspy.utils.variance import add_var, minus_var, divide_var, sum_var
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, fold_mode: str = None, compare_mode: str = None):
+    def __init__(self, fold_mode: str = None, compare_mode: str = None, control_index=0,
+                 base_indices=None, comb_indices=None):
         self.fold_mode = fold_mode
         self.compare_mode = compare_mode
+        self.control_index = control_index
+        self.base_indices = base_indices
+        self.comb_indices = comb_indices
     
     @staticmethod
     def create_process(cluster_block):
@@ -24,17 +29,21 @@ class Process(base.ElementProcess):
 
 def process_func(sp_result_list, conf: Conf):
     sp_list = tuple(np.array(sp) for sp, _ in sp_result_list)
-    x, yv_list, center_i = align_list(sp_list)
+    x, yv_list, center_i = align_list(sp_list, conf.control_index)
     x, yv_list = fold_list(x, yv_list, center_i, conf.fold_mode)
     yv_list = tuple(divide_var(y, y_var, *sum_var(y, y_var)) for y, y_var in yv_list)
-    yv_list = compare_list(yv_list, conf.compare_mode)
-    return tuple((x, y, y_var) for y, y_var in yv_list)
+    yv_list = compare_list(yv_list, conf.compare_mode, conf.control_index)
+    curve_list = tuple((x, y, y_var) for y, y_var in yv_list)
+    component_result = None if conf.base_indices is None \
+        else process_components(yv_list, conf.base_indices, conf.comb_indices, conf.control_index)
+    return curve_list, component_result
 
 
 # utils
 
-def align_list(sp_list, control_index=0):
+def align_list(sp_list, control_index=None):
     # todo recode if the x is not the same
+    control_index = 0 if control_index is None else control_index
     
     center_i_list = tuple(np.argmax(sp[1, :]) for sp in sp_list)
     center_i_min = min(center_i_list)
@@ -78,20 +87,61 @@ def fold_list(x, yv_list, center_i, mode):
         raise TypeError("Unsupported fold mode")
 
 
-def compare_list(yv_list, compare_mode, control_index=0):
+def compare_list(yv_list, mode, control_index=None):
     control_yv = None if control_index is None else yv_list[control_index]
-    return list(compare_yv(yv, control_yv, compare_mode, i == control_index) for i, yv in enumerate(yv_list))
+    return list(compare_yv(yv, control_yv, mode, i == control_index) for i, yv in enumerate(yv_list))
 
 
-def compare_yv(yv, control_yv, compare_mode, ignore_var=False):
+def compare_yv(yv, control_yv, mode, ignore_var=False):
     y, y_var = yv
-    if compare_mode in ('difference', 'subtract', None):
+    if mode in ('difference', 'subtract', None):
         control_y, control_y_var = (0, 0) if control_yv is None else control_yv
         c, c_var = minus_var(y, y_var, control_y, control_y_var)
-    elif compare_mode in ('ratio', 'divide'):
+    elif mode in ('ratio', 'divide'):
         control_y, control_y_var = (1, 0) if control_yv is None else control_yv
         c, c_var = divide_var(y, y_var, control_y, control_y_var)
     else:
-        raise TypeError(f"Unsupported compare mode {compare_mode}")
+        raise TypeError(f"Unsupported compare mode {mode}")
     c_var = np.zeros_like(c_var) if ignore_var else c_var
     return c, c_var
+
+
+def process_components(yv_list, base_indices, comb_indices, control_index):
+    y_list = tuple(y for y, _ in yv_list)
+    if control_index in base_indices:
+        raise TypeError("base_indices should not contains control_index!")
+    if comb_indices is None:
+        comb_indices = tuple(filter(lambda i: i != control_index and i not in base_indices, range(len(y_list))))
+    elif control_index in comb_indices:
+        raise TypeError("comb_indices should not contains control_index!")
+    
+    base_list = np.take(y_list, base_indices, 0)  # [nb,n]
+    comb_list = np.take(y_list, comb_indices, 0)  # [nc,n]
+    return tuple(fit_y2(y, base_list) for y in comb_list)
+
+
+def fit_y(y, base_list):
+    # y [n]
+    # base_list [nb,n]
+    func = lambda theta: np.sum(base_list * np.expand_dims(theta, -1), 0)
+    loss = lambda theta: np.sum(np.square(func(theta) - y))
+    
+    theta0 = np.zeros([len(base_list)])  # theta [nb]
+    res: opt.OptimizeResult = opt.minimize(loss, theta0)
+    
+    if not res.success:
+        return None
+    
+    theta_opt = res.x
+    sigma_opt = np.sqrt(np.mean(np.square(func(theta_opt) - y)))
+    return theta_opt, sigma_opt
+
+
+def fit_y2(y, base_list):
+    # y [n]
+    # base_list [nb,n]
+    p = np.sum(np.expand_dims(base_list, 0) * np.expand_dims(base_list, 1), -1)  # [nb,nb]
+    b = np.sum(np.expand_dims(y, 0) * base_list, -1, keepdims=True)  # [nb,1]
+    theta = np.dot(np.linalg.inv(p), b)
+    sigma = np.sqrt(np.mean(np.square(np.sum(base_list * np.expand_dims(theta, -1), 0) - y)))
+    return theta, sigma
