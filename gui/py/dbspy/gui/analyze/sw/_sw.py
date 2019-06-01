@@ -48,9 +48,9 @@ class Controller(base.ElementProcessController):
     
     def on_apply(self) -> Conf:
         return Conf(
-            s_radius=float(self.conf_rw.get()),
-            w_radius=float(self.conf_ra.get()),
-            a_radius=float(self.conf_rs.get()))
+            s_radius=float(self.conf_rs.get()),
+            w_radius=float(self.conf_rw.get()),
+            a_radius=float(self.conf_ra.get()))
     
     def on_update(self, result, exception):
         self.result_figure.clear()

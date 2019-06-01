@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import dbspy.core as core
-from dbspy.gui._main import Controller
+from dbspy.gui.main import Controller
 from . import spectrum, analyze
 
 
@@ -57,15 +57,23 @@ class Application:
         
         for i, spectrum_process in enumerate(self.process.spectrum_processes):
             tag = str(spectrum_process.tag)
-            spectrum_node = self.tree.insert(main_node, 'end', text='Spectrum ' + tag, value=['spectrum', i])
-            self.tree.insert(spectrum_node, 'end', text='raw data', value=['spectrum', i, 'raw'])
-            self.tree.insert(spectrum_node, 'end', text='resolution', value=['spectrum', i, 'res'])
-            self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
-            self.tree.insert(spectrum_node, 'end', text='background', value=['spectrum', i, 'bg'])
+            if isinstance(spectrum_process, core.spectrum.dbs.Process):
+                spectrum_node = self.tree.insert(main_node, 'end', text='DBS Spectrum ' + tag, value=['spectrum', i])
+                self.tree.insert(spectrum_node, 'end', text='raw', value=['spectrum', i, 'raw'])
+                self.tree.insert(spectrum_node, 'end', text='res', value=['spectrum', i, 'res'])
+                self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
+                self.tree.insert(spectrum_node, 'end', text='bg', value=['spectrum', i, 'bg'])
+            elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
+                spectrum_node = self.tree.insert(main_node, 'end', text='CDBS Spectrum ' + tag, value=['spectrum', i])
+                self.tree.insert(spectrum_node, 'end', text='raw', value=['spectrum', i, 'raw'])
+                self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
+                self.tree.insert(spectrum_node, 'end', text='sp', value=['spectrum', i, 'bg'])
         
         for i, analyze_process in enumerate(self.process.analyze_processes):
-            tag = {core.analyze.sw.Process: 'SW', core.analyze.curve.Process: 'Curve'}[type(analyze_process)]
-            self.tree.insert(main_node, 'end', text='Analyze ' + tag, value=['analyze', i])
+            if isinstance(analyze_process, core.analyze.sw.Process):
+                self.tree.insert(main_node, 'end', text='SW Analyze', value=['analyze', i])
+            elif isinstance(analyze_process, core.analyze.curve.Process):
+                self.tree.insert(main_node, 'end', text='Curve Analyze', value=['analyze', i])
     
     def on_tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
@@ -85,33 +93,35 @@ class Application:
             child.destroy()
         
         if key is None or len(key) == 0:
-            return
-        
-        if key[0] == 'main':
+            tk.Label(self.container, text="Nothing to show").pack()
+        elif key[0] == 'main':
             self.controller = Controller(self)
         elif key[0] == 'spectrum':
             spectrum_index = key[1]
             spectrum_process = self.process.spectrum_processes[spectrum_index]
-            if isinstance(spectrum_process, core.spectrum.dbs.Process):
-                if len(key) == 2:
-                    self.controller = spectrum.Controller(self, spectrum_index)
-                elif key[2] == 'raw':
+            if len(key) == 2:
+                self.controller = spectrum.Controller(self, spectrum_index)
+            elif isinstance(spectrum_process, core.spectrum.dbs.Process):
+                if key[2] == 'raw':
                     self.controller = spectrum.dbs.raw.Controller(self, spectrum_index)
                 elif key[2] == 'res':
                     pass
                 elif key[2] == 'peak':
                     pass
                 elif key[2] == 'bg':
-                    pass  # todo sub items of spectrum
+                    pass  # todo sub items
             elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
-                # todo
-                pass
+                if key[2] == 'raw':
+                    self.controller = spectrum.cdbs.raw.Controller(self, spectrum_index)
+                elif key[2] == 'peak':
+                    pass
+                elif key[2] == 'sp':
+                    pass  # todo sub items
         elif key[0] == 'analyze':
             analyze_index = key[1]
             analyze_process = self.process.analyze_processes[analyze_index]
             if isinstance(analyze_process, core.analyze.sw.Process):
                 self.controller = analyze.sw.Controller(self, analyze_index)
-            # todo curve
-            pass
-        
+            elif isinstance(analyze_process, core.analyze.curve.Process):
+                pass  # todo curve
         self.key = key

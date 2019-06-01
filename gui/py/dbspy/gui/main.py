@@ -16,12 +16,11 @@ class Controller(base.ProcessController):
     
     def on_create_result_frame(self, result_frame):
         tk.Label(result_frame, textvariable=self.spectrum_text).pack(anchor='w')
-        tk.Button(result_frame, text='New spectrum DBS', command=self.on_new_spectrum_dbs).pack(anchor='w')
-        tk.Button(result_frame, text='New spectrum CDBS', command=self.on_new_spectrum_cdbs).pack(anchor='w')
-        
-        tk.Label(result_frame, textvariable=self.analyze_text).pack(anchor='w', pady='10p 0')
-        tk.Button(result_frame, text='New analyze SW', command=self.on_new_analyze_sw).pack(anchor='w')
-        tk.Button(result_frame, text='New analyze Curve', command=self.on_new_analyze_curve).pack(anchor='w')
+        tk.Button(result_frame, text='New DBS spectrum', command=self.new_spectrum_dbs).pack(anchor='w')
+        tk.Button(result_frame, text='New CDBS spectrum', command=self.new_spectrum_cdbs).pack(anchor='w')
+        tk.Label(result_frame, textvariable=self.analyze_text).pack(anchor='w', pady=(10, 0))
+        tk.Button(result_frame, text='New SW analyze', command=self.new_analyze_sw).pack(anchor='w')
+        tk.Button(result_frame, text='New Curve analyze', command=self.new_analyze_curve).pack(anchor='w')
     
     def on_update(self, result, exception):
         spectrum_len = len(self.process.spectrum_processes)
@@ -29,24 +28,24 @@ class Controller(base.ProcessController):
         analyze_len = len(self.process.analyze_processes)
         self.analyze_text.set(f'You have {analyze_len} analyzes.')
     
-    def on_new_spectrum_dbs(self):
+    def new_spectrum_dbs(self):
         tag = '#' + str(len(self.process.spectrum_processes))
         new_spectrum_process = core.spectrum.dbs.Process(tag)
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     
-    def on_new_spectrum_cdbs(self):
+    def new_spectrum_cdbs(self):
         tag = '#' + str(len(self.process.spectrum_processes))
         new_spectrum_process = core.spectrum.cdbs.Process(tag)
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     
-    def on_new_analyze_sw(self):
+    def new_analyze_sw(self):
         new_analyze_process = core.analyze.sw.Process(self.process.spectrum_cluster_block)
         self.process.append_analyze_process(new_analyze_process)
         self.app.update_tree()
     
-    def on_new_analyze_curve(self):
+    def new_analyze_curve(self):
         new_analyze_process = core.analyze.curve.Process(self.process.spectrum_cluster_block)
         self.process.append_analyze_process(new_analyze_process)
         self.app.update_tree()
