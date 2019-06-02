@@ -7,15 +7,17 @@ from dbspy.core.analyze.sw import Conf
 from dbspy.gui import base
 
 
-class Controller(base.ElementProcessController):
+class Controller(base.FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.main_process = app.process
         self.index = index
         self.conf_rs = tk.StringVar()
         self.conf_rw = tk.StringVar()
         self.conf_ra = tk.StringVar()
-        self.result_controller = None
-        super().__init__(app.container, app.process.analyze_processes[index])
+        super().__init__(
+            app.container,
+            app.process.analyze_processes[index],
+            plt.figure(figsize=(7, 5)))
     
     def on_create_info_frame(self, info_frame):
         tk.Label(info_frame, text='SW Analyze').pack()
@@ -33,10 +35,6 @@ class Controller(base.ElementProcessController):
         tk.Entry(conf_frame, textvariable=self.conf_ra, width=4).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
     
-    def on_create_result_frame(self, result_frame):
-        self.result_controller = base.FigureController(result_frame, plt.figure(figsize=(7, 5)), self.on_draw_result)
-        self.result_controller.widget.pack(fill='both')
-    
     def on_reset(self, conf: Conf):
         self.conf_rs.set('0.0' if conf.s_radius is None else str(conf.s_radius))
         self.conf_rw.set('0.0' if conf.w_radius is None else str(conf.w_radius))
@@ -47,9 +45,6 @@ class Controller(base.ElementProcessController):
             s_radius=float(self.conf_rs.get()),
             w_radius=float(self.conf_rw.get()),
             a_radius=float(self.conf_ra.get()))
-    
-    def on_update(self, result, exception):
-        self.result_controller.draw(result, exception)
     
     def on_draw_result(self, figure, result, exception):
         if result is not None:

@@ -12,15 +12,15 @@ class Controller(base.ProcessController):
         super().__init__(app.container, app.process)
     
     def on_create_info_frame(self, info_frame):
-        pass
+        tk.Label(info_frame, textvariable=self.spectrum_text).pack(anchor='w')
+        tk.Button(info_frame, text='New DBS spectrum', command=self.new_spectrum_dbs).pack(anchor='w')
+        tk.Button(info_frame, text='New CDBS spectrum', command=self.new_spectrum_cdbs).pack(anchor='w')
+        tk.Label(info_frame, textvariable=self.analyze_text).pack(anchor='w', pady=(10, 0))
+        tk.Button(info_frame, text='New SW analyze', command=self.new_analyze_sw).pack(anchor='w')
+        tk.Button(info_frame, text='New Curve analyze', command=self.new_analyze_curve).pack(anchor='w')
     
     def on_create_result_frame(self, result_frame):
-        tk.Label(result_frame, textvariable=self.spectrum_text).pack(anchor='w')
-        tk.Button(result_frame, text='New DBS spectrum', command=self.new_spectrum_dbs).pack(anchor='w')
-        tk.Button(result_frame, text='New CDBS spectrum', command=self.new_spectrum_cdbs).pack(anchor='w')
-        tk.Label(result_frame, textvariable=self.analyze_text).pack(anchor='w', pady=(10, 0))
-        tk.Button(result_frame, text='New SW analyze', command=self.new_analyze_sw).pack(anchor='w')
-        tk.Button(result_frame, text='New Curve analyze', command=self.new_analyze_curve).pack(anchor='w')
+        pass
     
     def on_update(self, result, exception):
         spectrum_len = len(self.process.spectrum_processes)

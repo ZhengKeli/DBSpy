@@ -11,8 +11,7 @@ class Controller(DBSController):
         self.result_controller = base.FigureController(result_frame, plt.figure(figsize=(5, 5)), self.on_draw_result)
         self.result_controller.widget.pack(fill='both')
     
-    @staticmethod
-    def on_draw_result(figure, result, exception):
+    def on_draw_result(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
             (xi, xj), y = result

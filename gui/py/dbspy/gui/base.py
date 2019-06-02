@@ -1,10 +1,11 @@
 import abc
 import tkinter as tk
+from typing import Optional
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from dbspy.core.base import Process, ElementConf, ElementProcess
+from dbspy.core.base import Process, ElementConf
 
 
 class WidgetController(abc.ABC):
@@ -64,8 +65,6 @@ class ProcessController(WidgetController, abc.ABC):
 
 
 class ElementProcessController(ProcessController, abc.ABC):
-    def __init__(self, master: tk.Frame, process: ElementProcess):
-        super().__init__(master, process)
     
     def on_create_root_frame(self, root_frame):
         self.create_info_frame(root_frame)
@@ -129,3 +128,21 @@ class FigureController(WidgetController):
         self.figure.tight_layout()
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
+
+
+class FigureResultController(ProcessController, abc.ABC):
+    def __init__(self, master: tk.Frame, process: Process, result_figure: Optional[plt.Figure]):
+        self.result_figure = plt.Figure() if result_figure is None else result_figure
+        self.result_controller = None
+        super().__init__(master, process)
+    
+    def on_create_result_frame(self, result_frame):
+        self.result_controller = FigureController(result_frame, self.result_figure, self.on_draw_result)
+        self.result_controller.widget.pack(fill='both')
+    
+    def on_update(self, result, exception):
+        self.result_controller.draw(result, exception)
+    
+    @abc.abstractmethod
+    def on_draw_result(self, figure, result, exception):
+        pass
