@@ -6,11 +6,12 @@ import numpy as np
 
 from dbspy.core.analyze.sw import Conf
 from dbspy.gui import base
+from dbspy.gui._app import Application
 
 
 class Controller(base.FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
-        self.main_process = app.process
+        self.app: Application = app
         self.index = index
         self.conf_rs = tk.StringVar()
         self.conf_rw = tk.StringVar()
@@ -23,6 +24,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_info_frame(self, info_frame):
         tk.Label(info_frame, text='SW Analyze').pack()
+        tk.Button(info_frame, text='Remove', foreground='red', command=self.remove).pack()
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='rs=').pack(side='left')
@@ -55,12 +57,12 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_draw_result(self, figure, result, exception):
         if result is not None:
-            tag_list = tuple(process.tag for process in self.main_process.spectrum_processes)
+            tag_list = tuple(process.tag for process in self.app.process.spectrum_processes)
             s_list, s_var_list, w_list, w_var_list = zip(*(
                 (s, s_var, w, w_var) for (s, s_var, _), (w, w_var, _) in result))
             
             sp_index = 0
-            (x, y, _), _ = self.main_process.spectrum_processes[sp_index].value
+            (x, y, _), _ = self.app.process.spectrum_processes[sp_index].value
             (_, _, s_range_i), (_, _, w_range_i) = result[sp_index]
             peak_i = np.argmax(y)
             
@@ -86,3 +88,8 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         else:
             figure.gca().set_title("Error!")
             # todo show info
+    
+    def remove(self):
+        self.app.process.remove_analyze_process(self.process)
+        self.app.update_frame(['main'])
+        self.app.update_tree()

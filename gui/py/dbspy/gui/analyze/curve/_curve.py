@@ -6,11 +6,12 @@ import numpy as np
 
 from dbspy.core.analyze.curve import Conf
 from dbspy.gui import base
+from dbspy.gui._app import Application
 
 
 class Controller(base.FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
-        self.main_process = app.process
+        self.app: Application = app
         self.index = index
         self.conf_fold_mode = tk.StringVar()
         self.conf_compare_mode = tk.StringVar()
@@ -21,6 +22,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_info_frame(self, info_frame):
         tk.Label(info_frame, text='Curve Analyze').pack()
+        tk.Button(info_frame, text='Remove', foreground='red', command=self.remove).pack()
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text="fold_mode=").pack(side='left')
@@ -40,7 +42,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     def on_draw_result(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
-            tag_list = tuple(process.tag for process in self.main_process.spectrum_processes)
+            tag_list = tuple(process.tag for process in self.app.process.spectrum_processes)
             curve_list, _ = result
             conf = self.process.conf
             
@@ -57,3 +59,8 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         else:
             figure.gca().set_title("Error!")
             # todo show info
+    
+    def remove(self):
+        self.app.process.remove_analyze_process(self.process)
+        self.app.update_frame(['main'])
+        self.app.update_tree()

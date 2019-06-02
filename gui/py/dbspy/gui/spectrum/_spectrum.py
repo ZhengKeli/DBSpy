@@ -25,11 +25,12 @@ class Controller(base.ProcessController):
     
     @staticmethod
     def on_draw_result(figure, result, exception):
+        axe = figure.gca()
         if result is not None:
             (x, y, _), _ = result
-            figure.gca().semilogy(x, y)
+            axe.semilogy(x, y)
         else:
-            figure.gca().set_title("Error!")
+            axe.set_title("Error!")
             # todo show info
     
     def remove(self):

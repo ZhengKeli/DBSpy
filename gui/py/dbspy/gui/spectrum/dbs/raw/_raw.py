@@ -29,9 +29,10 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         return Conf(self.conf_file_path.get())
     
     def on_draw_result(self, figure, result, exception):
+        axe = figure.gca()
         if result is not None:
             x, y = result
-            figure.gca().plot(x, y)
+            axe.plot(x, y)
         else:
-            figure.gca().set_title("Error!")
+            axe.set_title("Error!")
             # todo show info
