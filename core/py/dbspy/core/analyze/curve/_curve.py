@@ -9,7 +9,10 @@ from dbspy.utils.variance import add_var, minus_var, divide_var, sum_var
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, fold_mode: str = None, compare_mode: str = None, control_index=0,
+    fold_modes = ('fold', 'none', 'right', 'left')
+    compare_modes = ('ratio', 'difference')
+    
+    def __init__(self, fold_mode: str = 'fold', compare_mode: str = 'ratio', control_index=0,
                  base_indices=None, comb_indices=None):
         self.fold_mode = fold_mode
         self.compare_mode = compare_mode
@@ -60,17 +63,7 @@ def align_list(sp_list, control_index=None):
 
 def fold_list(x, yv_list, center_i, mode):
     yv_list = np.array(yv_list)
-    if mode == 'none' or mode is None:
-        return x, yv_list
-    elif mode == 'left':
-        x_left = x[center_i] - x[:center_i + 1]
-        yv_left_list = yv_list[:, :, :center_i + 1]
-        return np.flip(x_left), np.flip(yv_left_list, 2)
-    elif mode == 'right':
-        x_right = x[center_i:] - x[center_i]
-        yv_right_list = yv_list[:, :, center_i:]
-        return x_right, yv_right_list
-    elif mode == 'fold':
+    if mode == 'fold':
         x_left, yv_left_list = fold_list(x, yv_list, center_i, 'left')
         x_right, yv_right_list = fold_list(x, yv_list, center_i, 'right')
         len_min = min(len(x_left), len(x_right))
@@ -83,6 +76,16 @@ def fold_list(x, yv_list, center_i, mode):
             *yv_right_list.transpose([1, 0, 2])
         ), [1, 0, 2])
         return x, yv_list
+    elif mode == 'none':
+        return x, yv_list
+    elif mode == 'right':
+        x_right = x[center_i:] - x[center_i]
+        yv_right_list = yv_list[:, :, center_i:]
+        return x_right, yv_right_list
+    elif mode == 'left':
+        x_left = x[center_i] - x[:center_i + 1]
+        yv_left_list = yv_list[:, :, :center_i + 1]
+        return np.flip(x_left), np.flip(yv_left_list, 2)
     else:
         raise TypeError("Unsupported fold mode")
 
@@ -92,18 +95,23 @@ def compare_list(yv_list, mode, control_index=None):
     return list(compare_yv(yv, control_yv, mode, i == control_index) for i, yv in enumerate(yv_list))
 
 
-def compare_yv(yv, control_yv, mode, ignore_var=False):
+def compare_yv(yv, control_yv, mode, is_control=False):
+    """
+    :return: c, c_var
+    """
     y, y_var = yv
-    if mode in ('difference', 'subtract', None):
-        control_y, control_y_var = (0, 0) if control_yv is None else control_yv
-        c, c_var = minus_var(y, y_var, control_y, control_y_var)
-    elif mode in ('ratio', 'divide'):
+    if mode == 'ratio':
+        if is_control:
+            return np.ones_like(y), np.zeros_like(y_var)
         control_y, control_y_var = (1, 0) if control_yv is None else control_yv
-        c, c_var = divide_var(y, y_var, control_y, control_y_var)
+        return divide_var(y, y_var, control_y, control_y_var)
+    elif mode == 'difference':
+        if is_control:
+            return np.zeros_like(y), np.zeros_like(y_var)
+        control_y, control_y_var = (0, 0) if control_yv is None else control_yv
+        return minus_var(y, y_var, control_y, control_y_var)
     else:
         raise TypeError(f"Unsupported compare mode {mode}")
-    c_var = np.zeros_like(c_var) if ignore_var else c_var
-    return c, c_var
 
 
 def process_components(yv_list, base_indices, comb_indices, control_index):

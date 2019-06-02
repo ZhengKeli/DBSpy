@@ -124,7 +124,7 @@ class Application:
             if isinstance(analyze_process, core.analyze.sw.Process):
                 self.controller = analyze.sw.Controller(self, analyze_index)
             elif isinstance(analyze_process, core.analyze.curve.Process):
-                pass  # todo curve
+                self.controller = analyze.curve.Controller(self, analyze_index)
         if self.controller is not None:
             self.controller.widget.pack(fill='both')
         self.key = key
