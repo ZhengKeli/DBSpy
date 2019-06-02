@@ -10,7 +10,9 @@ from dbspy.utils.variance import add_var, sum_var, divide_var
 # define
 
 class Conf(analyze.Conf):
-    def __init__(self, s_radius=None, w_radius=None, a_radius=None, w_mode=None):
+    w_modes = ('all', 'right', 'left')
+    
+    def __init__(self, s_radius=0.9, w_radius=2.9, a_radius=4.1, w_mode: str = 'all'):
         self.s_radius = s_radius
         self.w_radius = w_radius
         self.a_radius = a_radius
@@ -57,7 +59,7 @@ def compute_w(y, var, w_range_i, a_range_i, w_mode):
         wr_range_i = w_range_i[1], a_range_i[1]
         wr, wr_var = rate_var(y, var, *wr_range_i)
         return wr, wr_var, wr_range_i
-    elif w_mode == 'all' or w_mode is None:
+    elif w_mode == 'all':
         wl, wl_var, wl_range_i = compute_w(y, var, w_range_i, a_range_i, 'left')
         wr, wr_var, wr_range_i = compute_w(y, var, w_range_i, a_range_i, 'right')
         w, w_var = add_var(wl, wl_var, wr, wr_var)

@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,6 +15,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         self.conf_rs = tk.StringVar()
         self.conf_rw = tk.StringVar()
         self.conf_ra = tk.StringVar()
+        self.conf_w_mode = tk.StringVar()
         super().__init__(
             app.container,
             app.process.analyze_processes[index],
@@ -34,17 +36,22 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         tk.Label(conf_frame, text='ra=').pack(side='left', padx=(10, 0))
         tk.Entry(conf_frame, textvariable=self.conf_ra, width=4).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
+        
+        tk.Label(conf_frame, text="w_mode=").pack(side='left', padx=(10, 0))
+        ttk.OptionMenu(conf_frame, self.conf_w_mode, 'all', *Conf.w_modes).pack(side='left')
     
     def on_reset(self, conf: Conf):
-        self.conf_rs.set('0.0' if conf.s_radius is None else str(conf.s_radius))
-        self.conf_rw.set('0.0' if conf.w_radius is None else str(conf.w_radius))
-        self.conf_ra.set('0.0' if conf.a_radius is None else str(conf.a_radius))
+        self.conf_rs.set(str(conf.s_radius))
+        self.conf_rw.set(str(conf.w_radius))
+        self.conf_ra.set(str(conf.a_radius))
+        self.conf_w_mode.set(str(conf.w_mode))
     
     def on_apply(self) -> Conf:
         return Conf(
             s_radius=float(self.conf_rs.get()),
             w_radius=float(self.conf_rw.get()),
-            a_radius=float(self.conf_ra.get()))
+            a_radius=float(self.conf_ra.get()),
+            w_mode=self.conf_w_mode.get())
     
     def on_draw_result(self, figure, result, exception):
         if result is not None:
