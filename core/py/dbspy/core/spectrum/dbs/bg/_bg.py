@@ -7,9 +7,11 @@ from dbspy.utils.indexing import index_nearest
 # define
 
 class Conf(base.ElementConf):
-    def __init__(self, bg_radius=None, bg_range=None, bg_expand=None, bg_algorithm=None):
-        self.radius = bg_radius
-        self.range = bg_range
+    bg_algorithms = ('volumeLinear',)
+    
+    def __init__(self, bg_radius=15, bg_range=None, bg_expand=(1, 1), bg_algorithm='volumeLinear'):
+        self.bg_radius = bg_radius
+        self.bg_range = bg_range
         self.bg_expand = bg_expand
         self.bg_algorithm = bg_algorithm
 
@@ -23,12 +25,12 @@ def process_func(raw_result, peak_res, conf: Conf):
     raw_x, raw_y = raw_result
     peak_range_i, _, peak_center_i = peak_res
     
-    if conf.range is not None:
-        bg_range = conf.range
+    if conf.bg_range is not None:
+        bg_range = conf.bg_range
         bg_range_i = index_nearest(bg_range, raw_x)
-    elif conf.radius is not None:
+    elif conf.bg_radius is not None:
         peak_center = raw_x[peak_center_i + peak_range_i[0]]
-        bg_range = (peak_center - conf.radius, peak_center + conf.radius)
+        bg_range = (peak_center - conf.bg_radius, peak_center + conf.bg_radius)
         bg_range_i = index_nearest(bg_range, raw_x)
     else:
         bg_range_i = peak_range_i
@@ -42,7 +44,7 @@ def process_func(raw_result, peak_res, conf: Conf):
     ex_range_i = index_nearest(expanded_range, raw_x)
     
     bg_algorithm = conf.bg_algorithm
-    if bg_algorithm == 'volumeLinear' or bg_algorithm is None:
+    if bg_algorithm == 'volumeLinear':
         bg_y = volume_linear_bg(raw_y, *bg_range_i, *ex_range_i)
         bg_x = raw_x[slice(*bg_range_i)]
     else:

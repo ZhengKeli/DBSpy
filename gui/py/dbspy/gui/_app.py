@@ -110,7 +110,7 @@ class Application:
                 elif key[2] == 'peak':
                     pass
                 elif key[2] == 'bg':
-                    pass  # todo sub items
+                    self.controller = spectrum.dbs.bg.Controller(self, spectrum_index)
             elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
                 if key[2] == 'raw':
                     self.controller = spectrum.cdbs.raw.Controller(self, spectrum_index)
