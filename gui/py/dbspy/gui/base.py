@@ -1,19 +1,27 @@
 import abc
 import tkinter as tk
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
 from dbspy.core.base import Process, ElementConf, ElementProcess
 
 
-class ProcessController(abc.ABC):
-    def __init__(self, container: tk.Frame, process: Process):
+class WidgetController(abc.ABC):
+    def __init__(self, widget: tk.Widget):
+        self.widget = widget
+
+
+class ProcessController(WidgetController, abc.ABC):
+    def __init__(self, master: tk.Frame, process: Process):
         self.process = process
-        self.create_root_frame(container)
+        super().__init__(self.create_root_frame(master))
         self.init()
     
     def create_root_frame(self, container):
         root_frame = tk.Frame(container)
-        root_frame.pack(fill='both')
         self.on_create_root_frame(root_frame)
+        return root_frame
     
     def on_create_root_frame(self, root_frame):
         self.create_info_frame(root_frame)
@@ -38,6 +46,9 @@ class ProcessController(abc.ABC):
         pass
     
     def init(self):
+        self.on_init()
+    
+    def on_init(self):
         self.update()
     
     def update(self):
@@ -53,8 +64,8 @@ class ProcessController(abc.ABC):
 
 
 class ElementProcessController(ProcessController, abc.ABC):
-    def __init__(self, container: tk.Frame, process: ElementProcess):
-        super().__init__(container, process)
+    def __init__(self, master: tk.Frame, process: ElementProcess):
+        super().__init__(master, process)
     
     def on_create_root_frame(self, root_frame):
         self.create_info_frame(root_frame)
@@ -81,9 +92,9 @@ class ElementProcessController(ProcessController, abc.ABC):
     def on_create_operate_frame(self, operate_frame):
         pass
     
-    def init(self):
+    def on_init(self):
         self.reset()
-        self.update()
+        super().on_init()
     
     def reset(self):
         self.on_reset(self.process.conf)
@@ -100,3 +111,21 @@ class ElementProcessController(ProcessController, abc.ABC):
     @abc.abstractmethod
     def on_apply(self) -> ElementConf:
         pass
+
+
+class FigureController(WidgetController):
+    def __init__(self, master: tk.Frame, figure: plt.Figure, on_draw: callable):
+        self.figure = figure
+        self.on_draw = on_draw
+        canvas = FigureCanvasTkAgg(figure, master)
+        canvas.draw()
+        toolbar = NavigationToolbar2Tk(canvas, master)
+        toolbar.update()
+        super().__init__(canvas.get_tk_widget())
+    
+    def draw(self, *content):
+        self.figure.clear()
+        self.on_draw(self.figure, *content)
+        self.figure.tight_layout()
+        self.figure.canvas.draw()
+        self.figure.canvas.flush_events()

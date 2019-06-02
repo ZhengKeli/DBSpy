@@ -2,7 +2,6 @@ import tkinter as tk
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 from dbspy.core.analyze.sw import Conf
 from dbspy.gui import base
@@ -15,7 +14,7 @@ class Controller(base.ElementProcessController):
         self.conf_rs = tk.StringVar()
         self.conf_rw = tk.StringVar()
         self.conf_ra = tk.StringVar()
-        self.result_figure: plt.Figure = plt.figure(figsize=(7, 6))
+        self.result_controller = None
         super().__init__(app.container, app.process.analyze_processes[index])
     
     def on_create_info_frame(self, info_frame):
@@ -35,11 +34,8 @@ class Controller(base.ElementProcessController):
         tk.Label(conf_frame, text='eV').pack(side='left')
     
     def on_create_result_frame(self, result_frame):
-        canvas = FigureCanvasTkAgg(self.result_figure, result_frame)
-        canvas.draw()
-        toolbar = NavigationToolbar2Tk(canvas, result_frame)
-        toolbar.update()
-        canvas.get_tk_widget().pack(anchor='w', fill='both')
+        self.result_controller = base.FigureController(result_frame, plt.figure(figsize=(7, 5)), self.on_draw_result)
+        self.result_controller.widget.pack(fill='both')
     
     def on_reset(self, conf: Conf):
         self.conf_rs.set('0.0' if conf.s_radius is None else str(conf.s_radius))
@@ -53,7 +49,9 @@ class Controller(base.ElementProcessController):
             a_radius=float(self.conf_ra.get()))
     
     def on_update(self, result, exception):
-        self.result_figure.clear()
+        self.result_controller.draw(result, exception)
+    
+    def on_draw_result(self, figure, result, exception):
         if result is not None:
             tag_list = tuple(process.tag for process in self.main_process.spectrum_processes)
             s_list, s_var_list, w_list, w_var_list = zip(*(
@@ -64,9 +62,9 @@ class Controller(base.ElementProcessController):
             (_, _, s_range_i), (_, _, w_range_i) = result[sp_index]
             peak_i = np.argmax(y)
             
-            axe_sp = self.result_figure.add_subplot(2, 1, 1)
-            axe_s = self.result_figure.add_subplot(2, 2, 3)
-            axe_w = self.result_figure.add_subplot(2, 2, 4)
+            axe_sp = figure.add_subplot(2, 1, 1)
+            axe_s = figure.add_subplot(2, 2, 3)
+            axe_w = figure.add_subplot(2, 2, 4)
             
             axe_sp.fill_between(x[slice(*s_range_i)], y[slice(*s_range_i)], color='#0088ff')
             if isinstance(w_range_i[0], tuple):
@@ -84,8 +82,5 @@ class Controller(base.ElementProcessController):
             axe_w.set_title("W")
             axe_w.errorbar(tag_list, w_list, np.sqrt(w_var_list), capsize=3, fmt='.-', color='#ff8800')
         else:
-            self.result_figure.gca().set_title("Error!")
+            figure.gca().set_title("Error!")
             # todo show info
-        self.result_figure.tight_layout()
-        self.result_figure.canvas.draw()
-        self.result_figure.canvas.flush_events()

@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Optional
 
 import dbspy.core as core
-from dbspy.gui.main import Controller
-from . import spectrum, analyze
+from dbspy.gui import main
+from . import spectrum, analyze, base
 
 
 class Application:
@@ -22,7 +23,7 @@ class Application:
         
         self.container = tk.Frame(self.window, width=500, height=500)
         self.container.pack(side='left', fill='both', padx='4p', pady='4p')
-        self.controller = None
+        self.controller: Optional[base.WidgetController] = None
         self.init_frame()
         
         self.window.mainloop()
@@ -95,7 +96,7 @@ class Application:
         if key is None or len(key) == 0:
             tk.Label(self.container, text="Nothing to show").pack()
         elif key[0] == 'main':
-            self.controller = Controller(self)
+            self.controller = main.Controller(self)
         elif key[0] == 'spectrum':
             spectrum_index = key[1]
             spectrum_process = self.process.spectrum_processes[spectrum_index]
@@ -124,4 +125,6 @@ class Application:
                 self.controller = analyze.sw.Controller(self, analyze_index)
             elif isinstance(analyze_process, core.analyze.curve.Process):
                 pass  # todo curve
+        if self.controller is not None:
+            self.controller.widget.pack(fill='both')
         self.key = key
