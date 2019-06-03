@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.optimize as opt
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
@@ -125,27 +124,10 @@ def process_components(yv_list, base_indices, comb_indices, control_index):
     
     base_list = np.take(y_list, base_indices, 0)  # [nb,n]
     comb_list = np.take(y_list, comb_indices, 0)  # [nc,n]
-    return tuple(fit_y2(y, base_list) for y in comb_list)
+    return tuple(fit_y(y, base_list) for y in comb_list)
 
 
 def fit_y(y, base_list):
-    # y [n]
-    # base_list [nb,n]
-    func = lambda theta: np.sum(base_list * np.expand_dims(theta, -1), 0)
-    loss = lambda theta: np.sum(np.square(func(theta) - y))
-    
-    theta0 = np.zeros([len(base_list)])  # theta [nb]
-    res: opt.OptimizeResult = opt.minimize(loss, theta0)
-    
-    if not res.success:
-        return None
-    
-    theta_opt = res.x
-    sigma_opt = np.sqrt(np.mean(np.square(func(theta_opt) - y)))
-    return theta_opt, sigma_opt
-
-
-def fit_y2(y, base_list):
     # y [n]
     # base_list [nb,n]
     p = np.sum(np.expand_dims(base_list, 0) * np.expand_dims(base_list, 1), -1)  # [nb,nb]
