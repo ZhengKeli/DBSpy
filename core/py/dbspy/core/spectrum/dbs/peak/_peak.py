@@ -10,7 +10,7 @@ from dbspy.utils.variance import spectrum_var
 # define
 
 class Conf(base.ElementConf):
-    def __init__(self, search_range=None, peak_radius=None):
+    def __init__(self, search_range=neighborhood(511, 5), peak_radius=15):
         self.search_range = search_range
         self.peak_radius = peak_radius
 

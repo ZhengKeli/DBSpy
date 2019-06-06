@@ -1,1 +1,1 @@
-from . import raw, bg
+from . import raw, peak, bg

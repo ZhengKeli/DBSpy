@@ -108,7 +108,7 @@ class Application:
                 elif key[2] == 'res':
                     pass
                 elif key[2] == 'peak':
-                    pass
+                    self.controller = spectrum.dbs.peak.Controller(self, spectrum_index)
                 elif key[2] == 'bg':
                     self.controller = spectrum.dbs.bg.Controller(self, spectrum_index)
             elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
