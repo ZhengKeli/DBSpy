@@ -43,7 +43,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             search_range=neighborhood(center, radius / 2),
             peak_radius=radius)
     
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
             _, (peak_x, peak_y, _), peak_center_i = result

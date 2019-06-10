@@ -28,7 +28,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     def on_apply(self) -> Conf:
         return Conf(self.conf_file_path.get())
     
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
             x, y = result

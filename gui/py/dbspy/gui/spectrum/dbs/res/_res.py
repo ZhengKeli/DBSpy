@@ -56,7 +56,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             self.result_resolution.set("Error!")
         super().on_update(result, exception)
     
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
             _, ((peak_x, peak_y), peak_center_i) = result

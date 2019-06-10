@@ -39,7 +39,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             fold_mode=self.conf_fold_mode.get(),
             compare_mode=self.conf_compare_mode.get())
     
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         axe = figure.gca()
         if result is not None:
             tag_list = tuple(process.tag for process in self.app.process.spectrum_processes)

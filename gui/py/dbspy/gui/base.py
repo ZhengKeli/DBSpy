@@ -137,12 +137,15 @@ class FigureResultController(ProcessController, abc.ABC):
         super().__init__(master, process)
     
     def on_create_result_frame(self, result_frame):
-        self.result_controller = FigureController(result_frame, self.result_figure, self.on_draw_result)
+        self.result_controller = FigureController(result_frame, self.result_figure, self.on_update_draw)
         self.result_controller.widget.pack(fill='both')
     
     def on_update(self, result, exception):
+        self.update_draw(result, exception)
+    
+    def update_draw(self, result, exception):
         self.result_controller.draw(result, exception)
     
     @abc.abstractmethod
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         pass

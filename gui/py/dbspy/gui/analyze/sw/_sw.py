@@ -55,7 +55,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             a_radius=float(self.conf_ra.get()),
             w_mode=self.conf_w_mode.get())
     
-    def on_draw_result(self, figure, result, exception):
+    def on_update_draw(self, figure, result, exception):
         if result is not None:
             tag_list = tuple(process.tag for process in self.app.process.spectrum_processes)
             s_list, s_var_list, w_list, w_var_list = zip(*(
