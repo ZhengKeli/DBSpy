@@ -24,7 +24,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='radius=').pack(side='left')
-        tk.Entry(conf_frame, textvariable=self.conf_radius, width=4).pack(side='left')
+        tk.Entry(conf_frame, textvariable=self.conf_radius, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='expand=').pack(side='left', padx=(10, 0))

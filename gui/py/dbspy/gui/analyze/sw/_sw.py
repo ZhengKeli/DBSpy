@@ -28,15 +28,15 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='rs=').pack(side='left')
-        tk.Entry(conf_frame, textvariable=self.conf_rs, width=4).pack(side='left')
+        tk.Entry(conf_frame, textvariable=self.conf_rs, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='rw=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_rw, width=4).pack(side='left')
+        tk.Entry(conf_frame, textvariable=self.conf_rw, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='ra=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_ra, width=4).pack(side='left')
+        tk.Entry(conf_frame, textvariable=self.conf_ra, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text="w_mode=").pack(side='left', padx=(10, 0))
