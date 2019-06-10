@@ -16,10 +16,10 @@ class Process(base.ElementProcess):
         super().__init__(process_func, Conf(), raw_process.block)
 
 
-def process_func(raw_result, conf: Conf) -> float:
+def process_func(raw_result, conf: Conf):
     peak_range_i, (peak_x, peak_y, _), peak_center_i = peak.process_func(raw_result, conf)
     resolution = compute_resolution(peak_x, peak_y, peak_center_i)
-    return resolution
+    return resolution, ((peak_x, peak_y), peak_center_i)
 
 
 # utils

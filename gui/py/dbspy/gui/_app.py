@@ -106,7 +106,7 @@ class Application:
                 if key[2] == 'raw':
                     self.controller = spectrum.dbs.raw.Controller(self, spectrum_index)
                 elif key[2] == 'res':
-                    pass
+                    self.controller = spectrum.dbs.res.Controller(self, spectrum_index)
                 elif key[2] == 'peak':
                     self.controller = spectrum.dbs.peak.Controller(self, spectrum_index)
                 elif key[2] == 'bg':
