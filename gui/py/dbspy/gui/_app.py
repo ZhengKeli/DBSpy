@@ -115,7 +115,7 @@ class Application:
                 if key[2] == 'raw':
                     self.controller = spectrum.cdbs.raw.Controller(self, spectrum_index)
                 elif key[2] == 'peak':
-                    pass
+                    self.controller = spectrum.cdbs.peak.Controller(self, spectrum_index)
                 elif key[2] == 'sp':
                     pass  # todo sub items
         elif key[0] == 'analyze':

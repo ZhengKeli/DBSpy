@@ -38,17 +38,17 @@ def process_func(raw_result, conf: Conf):
         else neighborhood(xd[peak_i], conf.peak_radius_xd)
     peak_range_xm = (0, len(xm)) if conf.peak_radius_xm is None \
         else neighborhood(xm[peak_j], conf.peak_radius_xm)
-    peak_range_i = index_nearest(peak_range_xd, xd)
-    peak_range_j = index_nearest(peak_range_xm, xm)
+    peak_range_id = index_nearest(peak_range_xd, xd)
+    peak_range_im = index_nearest(peak_range_xm, xm)
     
-    xd = xd[slice(*peak_range_i)]
-    xm = xm[slice(*peak_range_j)]
-    y = y[slice(*peak_range_i), slice(*peak_range_j)]
-    y_var = y_var[slice(*peak_range_i), slice(*peak_range_j)]
-    peak_i -= peak_range_i[0]
-    peak_j -= peak_range_j[0]
-
-    return (peak_range_i, peak_range_j), ((xd, xm), y, y_var), (peak_i, peak_j)
+    xd = xd[slice(*peak_range_id)]
+    xm = xm[slice(*peak_range_im)]
+    y = y[slice(*peak_range_id), slice(*peak_range_im)]
+    y_var = y_var[slice(*peak_range_id), slice(*peak_range_im)]
+    peak_id = peak_i - peak_range_id[0]
+    peak_im = peak_j - peak_range_im[0]
+    
+    return (peak_range_id, peak_range_im), ((xd, xm), y, y_var), (peak_id, peak_im)
 
 
 # utils
