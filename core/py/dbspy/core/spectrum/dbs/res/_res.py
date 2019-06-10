@@ -3,12 +3,14 @@ import numpy as np
 from dbspy.core import base
 from dbspy.core.spectrum.dbs.peak import _peak as peak
 from dbspy.utils.gaussian import gaussian_fwhm, gaussian_fit
+from dbspy.utils.neighborhood import neighborhood
 
 
 # define
 
 class Conf(peak.Conf):
-    pass
+    def __init__(self, search_range=neighborhood(1157, 5), peak_radius=7):
+        super().__init__(search_range, peak_radius)
 
 
 class Process(base.ElementProcess):
