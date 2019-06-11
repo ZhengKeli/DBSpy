@@ -68,7 +68,7 @@ class Application:
                 spectrum_node = self.tree.insert(main_node, 'end', text='CDBS Spectrum ' + tag, value=['spectrum', i])
                 self.tree.insert(spectrum_node, 'end', text='raw', value=['spectrum', i, 'raw'])
                 self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
-                self.tree.insert(spectrum_node, 'end', text='sp', value=['spectrum', i, 'bg'])
+                self.tree.insert(spectrum_node, 'end', text='sp', value=['spectrum', i, 'sp'])
         
         for i, analyze_process in enumerate(self.process.analyze_processes):
             if isinstance(analyze_process, core.analyze.sw.Process):
@@ -117,7 +117,7 @@ class Application:
                 elif key[2] == 'peak':
                     self.controller = spectrum.cdbs.peak.Controller(self, spectrum_index)
                 elif key[2] == 'sp':
-                    pass  # todo sub items
+                    self.controller = spectrum.cdbs.sp.Controller(self, spectrum_index)
         elif key[0] == 'analyze':
             analyze_index = key[1]
             analyze_process = self.process.analyze_processes[analyze_index]

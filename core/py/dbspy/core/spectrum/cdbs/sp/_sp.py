@@ -35,7 +35,7 @@ def process_func(peak_result, conf: Conf):
     points = np.stack((res_x, res_y), 1)
     resolution = gaussian_fwhm(gaussian_fit(points))
     
-    return (sp_x, sp_y, sp_y_var), resolution
+    return (sp_x, sp_y, sp_y_var), (resolution, (res_x, res_y))
 
 
 # utils
