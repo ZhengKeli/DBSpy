@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage as ndi
 
-from dbspy.core.spectrum import cdbs
 from dbspy.core.spectrum.cdbs.peak import Conf
 from dbspy.gui import base
 from dbspy.utils.neighborhood import neighborhood
@@ -12,15 +11,13 @@ from dbspy.utils.neighborhood import neighborhood
 
 class Controller(base.FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
-        self.spectrum_process: cdbs.Process = app.process.spectrum_processes[index]
-        self.index = index
         self.conf_mean_center = tk.StringVar()
         self.conf_mean_radius = tk.StringVar()
         self.conf_diff_center = tk.StringVar()
         self.conf_diff_radius = tk.StringVar()
         super().__init__(
             app.container,
-            self.spectrum_process.peak_process,
+            app.process.spectrum_processes[index].peak_process,
             plt.figure(figsize=(5, 5)))
     
     def on_create_info_frame(self, info_frame):
@@ -70,10 +67,10 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             smy = ndi.gaussian_filter(np.log(y + 1), 3.0)
             axe.imshow(smy, extent=[xm[0], xm[-1], xd[-1], xd[0]], cmap='Greys')
             axe.contour(xm, xd, smy, colors='k')
+            axe.set_xlabel("(Ea+Eb)/2, eV")
+            axe.set_ylabel("(Ea-Eb)/2, eV")
             axe.plot([peak_xm, peak_xm], [xd[-1], xd[0]], '--', color='black')
             axe.plot([xm[0], xm[-1]], [peak_xd, peak_xd], '--', color='black')
-            axe.plot([xm[0], xm[-1]], [xd[-1], xd[0]], '--', color='black')
-            axe.plot([xm[-1], xm[0]], [xd[-1], xd[0]], '--', color='black')
         else:
             axe.set_title("Error!")
             # todo show info
