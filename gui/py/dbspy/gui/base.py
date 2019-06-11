@@ -57,7 +57,6 @@ class ProcessController(WidgetController, abc.ABC):
             self.on_update(self.process.value, None)
         except Exception as exception:
             self.on_update(None, exception)
-            raise
     
     @abc.abstractmethod
     def on_update(self, result, exception):

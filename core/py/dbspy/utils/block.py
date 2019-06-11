@@ -40,10 +40,17 @@ class FunctionBlock(Block):
         return tuple(self._arg_blocks)
     
     def check(self):
-        latest_arg_values, latest_arg_versions = zip(*(block.release for block in self.arg_blocks))
-        valid = (self._buffer_versions is not None) and all(
-            b == l for b, l in zip(self._buffer_versions, latest_arg_versions))
-        if not valid:
+        if len(self.arg_blocks) > 0:
+            latest_arg_values, latest_arg_versions = zip(*(block.release for block in self.arg_blocks))
+        else:
+            latest_arg_values, latest_arg_versions = [], []
+        
+        if self._buffer_versions is not None:
+            buffer_valid = all(b == l for b, l in zip(self._buffer_versions, latest_arg_versions))
+        else:
+            buffer_valid = False
+        
+        if not buffer_valid:
             self.value = self.func(*latest_arg_values)
             self._buffer_versions = latest_arg_versions
     
@@ -65,7 +72,7 @@ class FunctionBlock(Block):
 
 class ClusterBlock(FunctionBlock):
     def __init__(self, *blocks):
-        super().__init__(lambda *args: args, blocks)
+        super().__init__(lambda *args: args, *blocks)
     
     @property
     def blocks(self):
