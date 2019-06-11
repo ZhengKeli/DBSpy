@@ -9,8 +9,8 @@ class Conf(base.Conf):
     
     def encode(self):
         return {
-            'spectrum_cluster': tuple(conf.encode() for conf in self.spectrum_confs),
-            'analyze_cluster': tuple(conf.encode() for conf in self.analyze_confs)}
+            'spectrum_confs': tuple(conf.encode() for conf in self.spectrum_confs),
+            'analyze_confs': tuple(conf.encode() for conf in self.analyze_confs)}
     
     @classmethod
     def decode(cls, code: dict):

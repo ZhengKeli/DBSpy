@@ -1,8 +1,12 @@
+import json
 import tkinter as tk
+import webbrowser
+from tkinter import filedialog
 from tkinter import ttk
 from typing import Optional
 
 import dbspy.core as core
+from dbspy.core import Conf, Process
 from dbspy.gui import main
 from . import spectrum, analyze, base
 
@@ -28,16 +32,20 @@ class Application:
         
         self.window.mainloop()
     
+    # menu
+    
     def init_menu(self):
         self.menu = tk.Menu(self.window)
         
         menu_file = tk.Menu(self.menu, tearoff=0)
-        menu_file.add_command(label='New')
-        menu_file.add_command(label='Open')
+        menu_file.add_command(label='New', command=self.menu_command_new)
+        menu_file.add_command(label='Open', command=self.menu_command_open)
+        menu_file.add_command(label='Load', command=self.menu_command_load)
+        menu_file.add_command(label='Save', command=self.menu_command_save)
         self.menu.add_cascade(label="File", menu=menu_file)
         
         menu_help = tk.Menu(self.menu, tearoff=0)
-        menu_help.add_command(label='About')
+        menu_help.add_command(label='About', command=self.menu_command_about)
         self.menu.add_cascade(label='Help', menu=menu_help)
         
         self.window.config(menu=self.menu)
@@ -46,10 +54,52 @@ class Application:
     def update_menu(self):
         pass
     
+    @staticmethod
+    def menu_command_new():
+        Application()
+    
+    @staticmethod
+    def menu_command_open():
+        file_types = [('JSON file', '.json')]
+        file = filedialog.askopenfile(filetypes=file_types, defaultextension=file_types)
+        if file is not None:
+            conf_json = file.read()
+            conf_dict = json.loads(conf_json)
+            conf = Conf.decode(conf_dict)
+            process = Process()
+            process.conf = conf
+            Application(process)
+    
+    def menu_command_load(self):
+        file_types = [('JSON file', '.json')]
+        file = filedialog.askopenfile(filetypes=file_types, defaultextension=file_types)
+        if file is not None:
+            conf_json = file.read()
+            conf_dict = json.loads(conf_json)
+            conf = Conf.decode(conf_dict)
+            for spectrum_conf in conf.spectrum_confs:
+                self.process.append_spectrum_process(spectrum_conf.create_and_apply())
+            for artifact_conf in conf.analyze_confs:
+                self.process.append_analyze_process(artifact_conf.create_and_apply())
+    
+    def menu_command_save(self):
+        file_types = [('JSON file', '.json')]
+        file = filedialog.asksaveasfile(filetypes=file_types, defaultextension=file_types)
+        if file is not None:
+            conf_dict = self.process.conf.encode()
+            conf_json = json.dumps(conf_dict)
+            file.write(conf_json)
+    
+    @staticmethod
+    def menu_command_about():
+        webbrowser.open("https://github.com/ZhengKeli/DBSpy")
+    
+    # tree
+    
     def init_tree(self):
         self.tree: ttk.Treeview = ttk.Treeview(self.window, show="tree")
         self.tree.pack(side='left', fill='y')
-        self.tree.bind('<ButtonRelease-1>', self.on_tree_clicked)
+        self.tree.bind('<ButtonRelease-1>', self.tree_clicked)
         self.update_tree()
     
     def update_tree(self):
@@ -76,11 +126,13 @@ class Application:
             elif isinstance(analyze_process, core.analyze.curve.Process):
                 self.tree.insert(main_node, 'end', text='Curve Analyze', value=['analyze', i])
     
-    def on_tree_clicked(self, _):
+    def tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
         values = item['values']
         if len(values) > 0:
             self.update_frame(values)
+    
+    # frame
     
     def init_frame(self):
         self.update_frame(['main'])

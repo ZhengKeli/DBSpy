@@ -3,7 +3,7 @@ import abc
 from dbspy.core import base
 
 
-class Conf(base.Conf, abc.ABC):
+class Conf(base.ElementConf, abc.ABC):
     
     @staticmethod
     @abc.abstractmethod
@@ -31,8 +31,9 @@ class Conf(base.Conf, abc.ABC):
         del content_code['type']
         return c.decode_content(content_code)
     
+    @abc.abstractmethod
     def encode_content(self):
-        return super().encode()
+        super().encode()
     
     @classmethod
     def decode_content(cls, code):
