@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 
 import dbspy.core as core
 from dbspy.gui import base
@@ -29,14 +30,24 @@ class Controller(base.ProcessController):
         self.analyze_text.set(f'You have {analyze_len} analyzes.')
     
     def new_spectrum_dbs(self):
+        file_types = [('text file', '.txt'), ('all', '.*')]
+        file_path = filedialog.askopenfilename(filetypes=file_types, defaultextension=file_types)
         tag = '#' + str(len(self.process.spectrum_processes))
+        
         new_spectrum_process = core.spectrum.dbs.Process(tag)
+        new_spectrum_process.raw_process.conf = core.spectrum.dbs.raw.Conf(file_path)
+        
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     
     def new_spectrum_cdbs(self):
+        file_types = [('text file', '.txt'), ('all', '.*')]
+        file_path = filedialog.askopenfilename(filetypes=file_types, defaultextension=file_types)
         tag = '#' + str(len(self.process.spectrum_processes))
+        
         new_spectrum_process = core.spectrum.cdbs.Process(tag)
+        new_spectrum_process.raw_process.conf = core.spectrum.cdbs.raw.Conf(file_path)
+        
         self.process.append_spectrum_process(new_spectrum_process)
         self.app.update_tree()
     
