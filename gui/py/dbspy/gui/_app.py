@@ -62,33 +62,40 @@ class Application:
     def menu_command_open():
         file_types = [('JSON file', '.json')]
         file = filedialog.askopenfile(filetypes=file_types, defaultextension=file_types)
-        if file is not None:
-            conf_json = file.read()
-            conf_dict = json.loads(conf_json)
-            conf = Conf.decode(conf_dict)
-            process = Process()
-            process.conf = conf
-            Application(process)
+        if file is None:
+            return
+        conf_json = file.read()
+        file.close()
+        conf_dict = json.loads(conf_json)
+        conf = Conf.decode(conf_dict)
+        process = Process()
+        process.conf = conf
+        Application(process)
     
     def menu_command_load(self):
         file_types = [('JSON file', '.json')]
         file = filedialog.askopenfile(filetypes=file_types, defaultextension=file_types)
-        if file is not None:
-            conf_json = file.read()
-            conf_dict = json.loads(conf_json)
-            conf = Conf.decode(conf_dict)
-            for spectrum_conf in conf.spectrum_confs:
-                self.process.append_spectrum_process(spectrum_conf.create_and_apply())
-            for artifact_conf in conf.analyze_confs:
-                self.process.append_analyze_process(artifact_conf.create_and_apply())
+        if file is None:
+            return
+        conf_json = file.read()
+        file.close()
+        conf_dict = json.loads(conf_json)
+        conf = Conf.decode(conf_dict)
+        for spectrum_conf in conf.spectrum_confs:
+            self.process.append_spectrum_process(spectrum_conf.create_and_apply())
+        for artifact_conf in conf.analyze_confs:
+            self.process.append_analyze_process(artifact_conf.create_and_apply())
+        self.update_tree()
     
     def menu_command_save(self):
         file_types = [('JSON file', '.json')]
         file = filedialog.asksaveasfile(filetypes=file_types, defaultextension=file_types)
-        if file is not None:
-            conf_dict = self.process.conf.encode()
-            conf_json = json.dumps(conf_dict)
-            file.write(conf_json)
+        if file is None:
+            return
+        conf_dict = self.process.conf.encode()
+        conf_json = json.dumps(conf_dict)
+        file.write(conf_json)
+        file.close()
     
     @staticmethod
     def menu_command_about():
