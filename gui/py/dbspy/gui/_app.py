@@ -6,31 +6,33 @@ from tkinter import ttk
 from typing import Optional
 
 import dbspy.core as core
-from dbspy.core import Conf, Process
 from dbspy.gui import main
 from . import spectrum, analyze, base
 
 
 class Application:
-    def __init__(self, process: core.Process = None, conf_file_path=None):
+    def __init__(self, tk_root, app_path, conf_path=None, process=None):
+        self.tk_root = tk_root
+        self.app_path = app_path
+        
         if process is not None:
-            self.conf_file_path = None
-            self.process = process
-        elif conf_file_path is not None:
-            self.conf_file_path = conf_file_path
-            with open(self.conf_file_path, 'r') as conf_file:
+            self.conf_path = None
+            self.process: core.Process = process
+        elif conf_path is not None:
+            self.conf_path = conf_path
+            with open(self.conf_path, 'r') as conf_file:
                 conf_json = conf_file.read()
                 conf_dict = json.loads(conf_json)
-                conf = Conf.decode(conf_dict)
-                self.process = Process()
+                conf = core.Conf.decode(conf_dict)
+                self.process = core.Process()
                 self.process.conf = conf
         else:
-            self.conf_file_path = None
-            self.process = core.Process() if process is None else process
-        self.process: core.Process
+            self.conf_path = None
+            self.process = core.Process()
         
-        self.window = tk.Tk()
+        self.window = tk.Toplevel(tk_root)
         self.window.title("DBSpy")
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         
         self.menu = None
         self.key = None
@@ -43,8 +45,11 @@ class Application:
         self.container.pack(side='left', fill='both', padx='4p', pady='4p')
         self.controller: Optional[base.WidgetController] = None
         self.init_frame()
-        
-        self.window.mainloop()
+    
+    def on_closing(self):
+        self.window.destroy()
+        if len(self.tk_root.winfo_children()) == 0:
+            self.tk_root.quit()
     
     # menu
     
@@ -69,23 +74,13 @@ class Application:
     def update_menu(self):
         pass
     
-    @staticmethod
-    def menu_command_new():
-        Application()
+    def menu_command_new(self):
+        Application(self.tk_root, self.app_path, self.conf_path)
     
-    @staticmethod
-    def menu_command_open():
+    def menu_command_open(self):
         file_types = [('JSON file', '.json')]
-        file = filedialog.askopenfile(filetypes=file_types, defaultextension=file_types)
-        if file is None:
-            return
-        conf_json = file.read()
-        file.close()
-        conf_dict = json.loads(conf_json)
-        conf = Conf.decode(conf_dict)
-        process = Process()
-        process.conf = conf
-        Application(process)
+        file_path = filedialog.askopenfilename(filetypes=file_types, defaultextension=file_types)
+        Application(self.tk_root, self.app_path, file_path)
     
     def menu_command_load(self):
         file_types = [('JSON file', '.json')]
@@ -95,7 +90,7 @@ class Application:
         conf_json = file.read()
         file.close()
         conf_dict = json.loads(conf_json)
-        conf = Conf.decode(conf_dict)
+        conf = core.Conf.decode(conf_dict)
         for spectrum_conf in conf.spectrum_confs:
             self.process.append_spectrum_process(spectrum_conf.create_and_apply())
         for artifact_conf in conf.analyze_confs:
@@ -103,8 +98,8 @@ class Application:
         self.update_tree()
     
     def menu_command_save(self):
-        if self.conf_file_path is not None:
-            with open(self.conf_file_path, 'w') as file:
+        if self.conf_path is not None:
+            with open(self.conf_path, 'w') as file:
                 conf_dict = self.process.conf.encode()
                 conf_json = json.dumps(conf_dict)
                 file.write(conf_json)
@@ -118,7 +113,7 @@ class Application:
             conf_dict = self.process.conf.encode()
             conf_json = json.dumps(conf_dict)
             file.write(conf_json)
-        self.conf_file_path = file_path
+        self.conf_path = file_path
     
     @staticmethod
     def menu_command_about():

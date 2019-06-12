@@ -1,11 +1,13 @@
 import sys
+import tkinter as tk
 
 from dbspy.gui import Application
 
 args = sys.argv
-print("args=", args)
-if len(args) > 1:
-    conf_file_path = args[1]
-else:
-    conf_file_path = None
-Application(conf_file_path=conf_file_path)
+app_path = args[0] if len(args) > 0 else None
+conf_path = args[1] if len(args) > 1 else None
+
+root = tk.Tk()
+root.withdraw()
+Application(root, app_path, conf_path)
+root.mainloop()
