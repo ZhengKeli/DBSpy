@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import optimize
+from scipy.optimize import leastsq
 
 
 def gaussian_func(x, args):
@@ -20,7 +20,7 @@ def gaussian_fit_init_args(points):
 
 def gaussian_fit(points):
     init_args = gaussian_fit_init_args(points)
-    result = optimize.leastsq(
+    result = leastsq(
         lambda args, xs, ys: gaussian_func(xs, args) - ys,
         init_args, (points[:, 0], points[:, 1]))
     return result[0]

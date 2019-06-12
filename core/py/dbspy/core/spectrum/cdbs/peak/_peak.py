@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import ndimage
+from scipy.ndimage import gaussian_filter
 
 from dbspy.core import base
 # define
@@ -33,7 +33,7 @@ def process_func(raw_result, conf: Conf):
     
     search_range_i = index_nearest(search_range_xd, xd)
     search_range_j = index_nearest(search_range_xm, xm)
-    y_blur = ndimage.gaussian_filter(y, 3.0)
+    y_blur = gaussian_filter(y, 3.0)
     peak_i, peak_j = search_peak_center_ij(y_blur, search_range_i, search_range_j)
     
     peak_range_xd = (0, len(xd)) if conf.peak_radius_xd is None \

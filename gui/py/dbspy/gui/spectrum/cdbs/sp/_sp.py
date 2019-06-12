@@ -2,7 +2,7 @@ import tkinter as tk
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.ndimage as ndi
+from scipy.ndimage import gaussian_filter
 
 from dbspy.core.spectrum.cdbs.sp import Conf
 from dbspy.gui import base
@@ -56,7 +56,7 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     def on_update_draw(self, figure, result, exception):
         if result is not None:
             _, ((xd, xm), y, _), (peak_id, peak_im) = self.spectrum_process.peak_process.value
-            smy = ndi.gaussian_filter(np.log(y + 1), 3.0)
+            smy = gaussian_filter(np.log(y + 1), 3.0)
             
             conf = self.process.conf
             band_range_xm = neighborhood(xm[peak_im], conf.res_band_radius)
