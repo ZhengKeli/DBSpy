@@ -1,3 +1,5 @@
+from collections import Iterable
+
 import numpy as np
 
 from dbspy.core import base
@@ -37,8 +39,8 @@ def process_func(raw_result, peak_res, conf: Conf):
         bg_range = raw_x[bg_range_i[0]], raw_x[bg_range_i[1]]
     
     bg_expand = 0.0 if conf.bg_expand is None else conf.bg_expand
-    if isinstance(bg_expand, float) or isinstance(bg_expand, int):
-        bg_expand = [bg_expand, bg_expand]
+    if not isinstance(bg_expand, Iterable):
+        bg_expand = (bg_expand, bg_expand)
     
     expanded_range = bg_range[0] - bg_expand[0], bg_range[1] + bg_expand[1]
     ex_range_i = index_nearest(expanded_range, raw_x)

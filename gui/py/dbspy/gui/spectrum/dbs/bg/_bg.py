@@ -13,7 +13,8 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         self.spectrum_process: dbs.Process = app.process.spectrum_processes[index]
         self.index = index
         self.conf_radius = tk.StringVar()
-        self.conf_expand = tk.StringVar()
+        self.conf_left_expand = tk.StringVar()
+        self.conf_right_expand = tk.StringVar()
         super().__init__(
             app.container,
             self.spectrum_process.bg_process,
@@ -27,26 +28,30 @@ class Controller(base.FigureResultController, base.ElementProcessController):
         tk.Entry(conf_frame, textvariable=self.conf_radius, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
-        tk.Label(conf_frame, text='expand=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_expand, width=6).pack(side='left')
+        tk.Label(conf_frame, text='left_expand=').pack(side='left', padx=(10, 0))
+        tk.Entry(conf_frame, textvariable=self.conf_left_expand, width=6).pack(side='left')
+        tk.Label(conf_frame, text='eV').pack(side='left')
+        
+        tk.Label(conf_frame, text='right_expand=').pack(side='left', padx=(10, 0))
+        tk.Entry(conf_frame, textvariable=self.conf_right_expand, width=6).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
     
     def on_reset(self, conf: Conf):
         self.conf_radius.set(str(conf.bg_radius))
+        
         if isinstance(conf.bg_expand, Iterable):
-            expand = '  '.join(str(item) for item in conf.bg_expand)
+            left_expand, right_expand = conf.bg_expand
         else:
-            expand = str(conf.bg_expand)
-        self.conf_expand.set(expand)
+            left_expand = right_expand = conf.bg_expand
+        self.conf_left_expand.set(str(left_expand))
+        self.conf_right_expand.set(str(right_expand))
     
     def on_apply(self) -> Conf:
-        expand = self.conf_expand.get().split()
-        if len(expand) == 1:
-            expand = expand[0], expand[0]
-        expand = tuple(float(item) for item in expand)
+        left_expand = float(self.conf_left_expand.get())
+        right_expand = float(self.conf_right_expand.get())
         return Conf(
             bg_radius=float(self.conf_radius.get()),
-            bg_expand=expand)
+            bg_expand=(left_expand, right_expand))
     
     def on_update_draw(self, figure, result, exception):
         axe = figure.gca()
