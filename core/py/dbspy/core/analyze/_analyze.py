@@ -31,9 +31,8 @@ class Conf(base.ElementConf, abc.ABC):
         del content_code['type']
         return c.decode_content(content_code)
     
-    @abc.abstractmethod
     def encode_content(self):
-        super().encode()
+        return super().encode()
     
     @classmethod
     def decode_content(cls, code):

@@ -84,7 +84,7 @@ class Application:
         for spectrum_conf in conf.spectrum_confs:
             self.process.append_spectrum_process(spectrum_conf.create_and_apply())
         for artifact_conf in conf.analyze_confs:
-            self.process.append_analyze_process(artifact_conf.create_and_apply())
+            self.process.append_analyze_process(artifact_conf.create_and_apply(self.process.spectrum_cluster_block))
         self.update_tree()
     
     def menu_command_save(self):

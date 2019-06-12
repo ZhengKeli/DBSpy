@@ -5,7 +5,7 @@ from dbspy.core import base
 
 class Conf(base.Conf, abc.ABC):
     
-    def __init__(self, tag):
+    def __init__(self, tag=None):
         self.tag = tag
     
     @abc.abstractmethod
@@ -34,9 +34,7 @@ class Conf(base.Conf, abc.ABC):
         content_code = code.copy()
         del content_code['type']
         del content_code['tag']
-        instance = c.decode_content(content_code)
-        instance.tag = tag
-        return instance
+        return c.decode_content(tag, content_code)
     
     @abc.abstractmethod
     def encode_content(self):
@@ -44,7 +42,7 @@ class Conf(base.Conf, abc.ABC):
     
     @classmethod
     @abc.abstractmethod
-    def decode_content(cls, code):
+    def decode_content(cls, tag, code):
         pass
 
 

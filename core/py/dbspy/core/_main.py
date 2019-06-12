@@ -15,8 +15,8 @@ class Conf(base.Conf):
     @classmethod
     def decode(cls, code: dict):
         return cls(
-            tuple(spectrum.Conf.decode(c) for c in code['spectrum_cluster']),
-            tuple(analyze.Conf.decode(c) for c in code['analyze_cluster']))
+            tuple(spectrum.Conf.decode(c) for c in code['spectrum_confs']),
+            tuple(analyze.Conf.decode(c) for c in code['analyze_confs']))
 
 
 class Process(base.Process):

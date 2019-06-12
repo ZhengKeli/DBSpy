@@ -9,7 +9,9 @@ from dbspy.utils.variance import spectrum_var
 
 
 class Conf(base.ElementConf):
-    def __init__(self, search_range_xd=None, search_range_xm=None, peak_radius_xd=None, peak_radius_xm=None):
+    def __init__(self, search_range_xd=neighborhood(0, 5),
+                 search_range_xm=neighborhood(0, 5),
+                 peak_radius_xd=35, peak_radius_xm=35):
         # todo rotate
         self.search_range_xd = search_range_xd
         self.search_range_xm = search_range_xm

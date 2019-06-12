@@ -25,12 +25,13 @@ class Conf(spectrum.Conf):
             'bg': self.bg.encode()}
     
     @classmethod
-    def decode_content(cls, code):
+    def decode_content(cls, tag, code):
         return cls(
-            raw.Conf.decode(code['raw']),
-            res.Conf.decode(code['res']),
-            peak.Conf.decode(code['peak']),
-            bg.Conf.decode(code['bg']))
+            tag=tag,
+            raw_conf=raw.Conf.decode(code['raw']),
+            res_conf=res.Conf.decode(code['res']),
+            peak_conf=peak.Conf.decode(code['peak']),
+            bg_conf=bg.Conf.decode(code['bg']))
 
 
 class Process(spectrum.Process):
