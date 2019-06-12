@@ -12,8 +12,22 @@ from . import spectrum, analyze, base
 
 
 class Application:
-    def __init__(self, process: core.Process = None):
-        self.process: core.Process = core.Process() if process is None else process
+    def __init__(self, process: core.Process = None, conf_file_path=None):
+        if process is not None:
+            self.conf_file_path = None
+            self.process = process
+        elif conf_file_path is not None:
+            self.conf_file_path = conf_file_path
+            with open(self.conf_file_path, 'r') as conf_file:
+                conf_json = conf_file.read()
+                conf_dict = json.loads(conf_json)
+                conf = Conf.decode(conf_dict)
+                self.process = Process()
+                self.process.conf = conf
+        else:
+            self.conf_file_path = None
+            self.process = core.Process() if process is None else process
+        self.process: core.Process
         
         self.window = tk.Tk()
         self.window.title("DBSpy")
@@ -42,6 +56,7 @@ class Application:
         menu_file.add_command(label='Open', command=self.menu_command_open)
         menu_file.add_command(label='Load', command=self.menu_command_load)
         menu_file.add_command(label='Save', command=self.menu_command_save)
+        menu_file.add_command(label='Save as', command=self.menu_command_save_as)
         self.menu.add_cascade(label="File", menu=menu_file)
         
         menu_help = tk.Menu(self.menu, tearoff=0)
@@ -88,14 +103,22 @@ class Application:
         self.update_tree()
     
     def menu_command_save(self):
+        if self.conf_file_path is not None:
+            with open(self.conf_file_path, 'w') as file:
+                conf_dict = self.process.conf.encode()
+                conf_json = json.dumps(conf_dict)
+                file.write(conf_json)
+        else:
+            self.menu_command_save_as()
+    
+    def menu_command_save_as(self):
         file_types = [('JSON file', '.json')]
-        file = filedialog.asksaveasfile(filetypes=file_types, defaultextension=file_types)
-        if file is None:
-            return
-        conf_dict = self.process.conf.encode()
-        conf_json = json.dumps(conf_dict)
-        file.write(conf_json)
-        file.close()
+        file_path = filedialog.asksaveasfilename(filetypes=file_types, defaultextension=file_types)
+        with open(file_path, 'w') as file:
+            conf_dict = self.process.conf.encode()
+            conf_json = json.dumps(conf_dict)
+            file.write(conf_json)
+        self.conf_file_path = file_path
     
     @staticmethod
     def menu_command_about():
