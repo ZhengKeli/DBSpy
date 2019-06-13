@@ -11,7 +11,7 @@ from . import spectrum, analyze, base
 
 
 class Application:
-    def __init__(self, tk_root, app_path, conf_path=None, process=None):
+    def __init__(self, tk_root, app_path=None, conf_path=None, process=None):
         self.tk_root = tk_root
         self.app_path = app_path
         
@@ -30,9 +30,8 @@ class Application:
             self.conf_path = None
             self.process = core.Process()
         
-        self.window = tk.Toplevel(tk_root)
-        self.window.title("DBSpy")
-        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.window = None
+        self.init_window()
         
         self.menu = None
         self.key = None
@@ -41,12 +40,24 @@ class Application:
         self.tree = None
         self.init_tree()
         
-        self.container = tk.Frame(self.window, width=500, height=500)
-        self.container.pack(side='left', fill='both', padx='4p', pady='4p')
+        self.container = None
         self.controller: Optional[base.WidgetController] = None
         self.init_frame()
     
-    def on_closing(self):
+    # window
+    
+    def init_window(self):
+        self.window = tk.Toplevel(self.tk_root)
+        self.window.protocol("WM_DELETE_WINDOW", self.destroy_window)
+        self.update_window()
+    
+    def update_window(self):
+        if self.conf_path is None:
+            self.window.title("DBSpy")
+        else:
+            self.window.title("DBSpy - " + self.conf_path)
+    
+    def destroy_window(self):
         self.window.destroy()
         if len(self.tk_root.winfo_children()) == 0:
             self.tk_root.quit()
@@ -114,6 +125,7 @@ class Application:
             conf_json = json.dumps(conf_dict)
             file.write(conf_json)
         self.conf_path = file_path
+        self.update_window()
     
     @staticmethod
     def menu_command_about():
@@ -160,6 +172,8 @@ class Application:
     # frame
     
     def init_frame(self):
+        self.container = tk.Frame(self.window, width=500, height=500)
+        self.container.pack(side='left', fill='both', padx='4p', pady='4p')
         self.update_frame(['main'])
     
     def update_frame(self, key=None):
