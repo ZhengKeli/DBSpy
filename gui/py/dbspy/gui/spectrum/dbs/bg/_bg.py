@@ -25,15 +25,15 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='radius=').pack(side='left')
-        tk.Entry(conf_frame, textvariable=self.conf_radius, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_radius).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='left_expand=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_left_expand, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_left_expand).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='right_expand=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_right_expand, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_right_expand).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
     
     def on_reset(self, conf: Conf):

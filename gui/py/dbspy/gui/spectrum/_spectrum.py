@@ -18,7 +18,7 @@ class Controller(base.ProcessController):
         
         tag_frame = tk.Frame(info_frame)
         tk.Label(tag_frame, text='tag=').pack(side='left')
-        tk.Entry(tag_frame, textvariable=self.conf_tag, width=6).pack(side='left')
+        tk.Entry(tag_frame, width=6, textvariable=self.conf_tag).pack(side='left')
         tk.Button(tag_frame, text='OK', command=self.apply_tag).pack(side='left')
         tag_frame.pack()
         

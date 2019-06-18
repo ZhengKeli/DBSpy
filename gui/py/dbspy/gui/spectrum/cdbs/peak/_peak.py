@@ -25,19 +25,19 @@ class Controller(base.FigureResultController, base.ElementProcessController):
     
     def on_create_conf_frame(self, conf_frame):
         tk.Label(conf_frame, text='mean_center=').pack(side='left')
-        tk.Entry(conf_frame, textvariable=self.conf_mean_center, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_mean_center).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='mean_radius=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_mean_radius, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_mean_radius).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='diff_center=').pack(side='left')
-        tk.Entry(conf_frame, textvariable=self.conf_diff_center, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_diff_center).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
         
         tk.Label(conf_frame, text='diff_radius=').pack(side='left', padx=(10, 0))
-        tk.Entry(conf_frame, textvariable=self.conf_diff_radius, width=6).pack(side='left')
+        tk.Entry(conf_frame, width=6, textvariable=self.conf_diff_radius).pack(side='left')
         tk.Label(conf_frame, text='eV').pack(side='left')
     
     def on_reset(self, conf: Conf):
