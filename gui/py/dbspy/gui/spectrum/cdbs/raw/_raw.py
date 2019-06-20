@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage as ndi
 
-from dbspy.gui import base
 from dbspy.gui.spectrum.dbs.raw._raw import Controller as DBSController
+from dbspy.gui.utils.figure import FigureController
 
 
 class Controller(DBSController):
     def on_create_result_frame(self, result_frame):
-        self.result_controller = base.FigureController(result_frame, plt.figure(figsize=(5, 5)), self.on_update_draw)
+        self.result_controller = FigureController(result_frame, plt.figure(figsize=(5, 5)), self.on_update_draw)
         self.result_controller.widget.pack(fill='both')
     
     def on_update_draw(self, figure, result, exception):

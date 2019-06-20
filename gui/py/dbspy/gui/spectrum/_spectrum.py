@@ -3,6 +3,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 
 from dbspy.gui import base
+from dbspy.gui.utils.figure import FigureController
 
 
 class Controller(base.ProcessController):
@@ -25,7 +26,7 @@ class Controller(base.ProcessController):
         tk.Button(info_frame, text='Remove', foreground='red', command=self.remove).pack()
     
     def on_create_result_frame(self, result_frame):
-        self.result_controller = base.FigureController(result_frame, plt.figure(), self.on_draw_result)
+        self.result_controller = FigureController(result_frame, plt.figure(), self.on_draw_result)
         self.result_controller.widget.pack(anchor='w', fill='both')
     
     def on_update(self, result, exception):

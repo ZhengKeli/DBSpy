@@ -10,7 +10,7 @@ from dbspy.gui import base
 from dbspy.gui.utils.figure import FigureResultController
 
 
-class Controller(base.FigureResultController, base.ElementProcessController):
+class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.spectrum_process = app.process.spectrum_processes[index]
         self.conf_sp_band_radius = tk.StringVar()

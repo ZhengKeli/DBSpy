@@ -10,7 +10,7 @@ from dbspy.gui import base
 from dbspy.gui.utils.figure import FigureResultController
 
 
-class Controller(base.FigureResultController, base.ElementProcessController):
+class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.conf_mean_center = tk.StringVar()
         self.conf_mean_radius = tk.StringVar()

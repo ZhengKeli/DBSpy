@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 
 from dbspy.core.spectrum.dbs.raw import Conf
 from dbspy.gui import base
+from dbspy.gui.utils.figure import FigureResultController
 
 
-class Controller(base.FigureResultController, base.ElementProcessController):
+class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.index = index
         self.conf_file_path = tk.StringVar()

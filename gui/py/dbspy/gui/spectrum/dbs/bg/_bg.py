@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from dbspy.core.spectrum import dbs
 from dbspy.core.spectrum.dbs.bg import Conf
 from dbspy.gui import base
+from dbspy.gui.utils.figure import FigureResultController
 
 
-class Controller(base.FigureResultController, base.ElementProcessController):
+class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.spectrum_process: dbs.Process = app.process.spectrum_processes[index]
         self.index = index

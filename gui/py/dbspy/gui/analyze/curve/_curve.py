@@ -7,9 +7,10 @@ import numpy as np
 from dbspy.core.analyze.curve import Conf
 from dbspy.gui import base
 from dbspy.gui._app import Application
+from dbspy.gui.utils.figure import FigureResultController
 
 
-class Controller(base.FigureResultController, base.ElementProcessController):
+class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
         self.app: Application = app
         self.index = index
