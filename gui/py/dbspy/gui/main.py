@@ -46,6 +46,7 @@ class Controller(base.ProcessController):
         new_spectrum_process.raw_process.conf = core.spectrum.dbs.raw.Conf(file_path)
         
         self.process.append_spectrum_process(new_spectrum_process)
+        self.update()
         self.app.update_tree()
     
     def new_spectrum_cdbs(self):
@@ -57,14 +58,17 @@ class Controller(base.ProcessController):
         new_spectrum_process.raw_process.conf = core.spectrum.cdbs.raw.Conf(file_path)
         
         self.process.append_spectrum_process(new_spectrum_process)
+        self.update()
         self.app.update_tree()
     
     def new_analyze_sw(self):
         new_analyze_process = core.analyze.sw.Process(self.process.spectrum_cluster_block)
         self.process.append_analyze_process(new_analyze_process)
+        self.update()
         self.app.update_tree()
     
     def new_analyze_curve(self):
         new_analyze_process = core.analyze.curve.Process(self.process.spectrum_cluster_block)
         self.process.append_analyze_process(new_analyze_process)
+        self.update()
         self.app.update_tree()
