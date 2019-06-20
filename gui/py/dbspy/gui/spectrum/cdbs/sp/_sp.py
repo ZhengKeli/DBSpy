@@ -65,10 +65,10 @@ class Controller(base.FigureResultController, base.ElementProcessController):
             axe_peak = figure.add_subplot(1, 3, 1)
             axe_peak.imshow(smy, extent=[xm[0], xm[-1], xd[-1], xd[0]], cmap='Greys')
             axe_peak.contour(xm, xd, smy, colors='k')
-            axe_peak.plot([band_range_xm[0], band_range_xm[0]], [xd[-1], xd[0]], '--', color='black')
-            axe_peak.plot([band_range_xm[1], band_range_xm[1]], [xd[-1], xd[0]], '--', color='black')
-            axe_peak.plot([xm[0], xm[-1]], [band_range_xd[0], band_range_xd[0]], '--', color='black')
-            axe_peak.plot([xm[0], xm[-1]], [band_range_xd[1], band_range_xd[1]], '--', color='black')
+            axe_peak.plot([xd[-1], xd[0]], [band_range_xm[0], band_range_xm[0]], '--', color='black')
+            axe_peak.plot([xd[-1], xd[0]], [band_range_xm[1], band_range_xm[1]], '--', color='black')
+            axe_peak.plot([band_range_xd[0], band_range_xd[0]], [xm[0], xm[-1]], '--', color='black')
+            axe_peak.plot([band_range_xd[1], band_range_xd[1]], [xm[0], xm[-1]], '--', color='black')
             
             (sp_x, sp_y, _), (resolution, (res_x, res_y)) = result
             
