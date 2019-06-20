@@ -30,16 +30,18 @@ class Controller(base.ProcessController):
         self.analyze_text.set(f'You have {analyze_len} analyzes.')
     
     PENDING_TAGS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    PENDING_INDEX = -1
     
     @staticmethod
-    def get_pending_tag(index):
-        return Controller.PENDING_TAGS[index % len(Controller.PENDING_TAGS)]
+    def get_pending_tag():
+        Controller.PENDING_INDEX += 1
+        return Controller.PENDING_TAGS[Controller.PENDING_INDEX % len(Controller.PENDING_TAGS)]
     
     def new_spectrum_dbs(self):
         file_types = [('text file', '.txt'), ('all', '.*')]
         file_path = filedialog.askopenfilename(filetypes=file_types, defaultextension=file_types)
         
-        tag = self.get_pending_tag(len(self.process.spectrum_processes))
+        tag = self.get_pending_tag()
         new_spectrum_process = core.spectrum.dbs.Process(tag)
         new_spectrum_process.raw_process.conf = core.spectrum.dbs.raw.Conf(file_path)
         
@@ -50,7 +52,7 @@ class Controller(base.ProcessController):
         file_types = [('text file', '.txt'), ('all', '.*')]
         file_path = filedialog.askopenfilename(filetypes=file_types, defaultextension=file_types)
         
-        tag = self.get_pending_tag(len(self.process.spectrum_processes))
+        tag = self.get_pending_tag()
         new_spectrum_process = core.spectrum.cdbs.Process(tag)
         new_spectrum_process.raw_process.conf = core.spectrum.cdbs.raw.Conf(file_path)
         
