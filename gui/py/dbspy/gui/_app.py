@@ -7,7 +7,6 @@ from typing import Optional
 
 import dbspy.core as core
 from dbspy.gui import main
-from dbspy.gui.utils.threading import synchronized
 from . import spectrum, analyze, base
 
 
@@ -179,7 +178,6 @@ class Application:
         self.container.pack(side='left', fill='both', padx='4p', pady='4p')
         self.update_frame(['main'])
     
-    @synchronized
     def update_frame(self, key=None):
         if self.key == key:
             return
