@@ -1,7 +1,7 @@
 import numpy as np
 
 from dbspy.core.spectrum import _spectrum as spectrum
-from dbspy.utils.block import FunctionBlock
+from dbspy.core.utils.block import FunctionBlock
 from . import bg, peak, raw, res
 
 

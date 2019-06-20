@@ -5,8 +5,9 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 from dbspy.core.spectrum.cdbs.sp import Conf
+from dbspy.core.utils.neighborhood import neighborhood
 from dbspy.gui import base
-from dbspy.utils.neighborhood import neighborhood
+from dbspy.gui.utils.figure import FigureResultController
 
 
 class Controller(base.FigureResultController, base.ElementProcessController):

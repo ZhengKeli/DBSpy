@@ -1,7 +1,7 @@
 import abc
 from copy import deepcopy
 
-from dbspy.utils.block import Block, FunctionBlock
+from dbspy.core.utils.block import Block, FunctionBlock
 
 
 class Process(abc.ABC):

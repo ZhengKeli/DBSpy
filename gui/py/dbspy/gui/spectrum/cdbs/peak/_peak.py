@@ -5,8 +5,9 @@ import numpy as np
 import scipy.ndimage as ndi
 
 from dbspy.core.spectrum.cdbs.peak import Conf
+from dbspy.core.utils.neighborhood import neighborhood
 from dbspy.gui import base
-from dbspy.utils.neighborhood import neighborhood
+from dbspy.gui.utils.figure import FigureResultController
 
 
 class Controller(base.FigureResultController, base.ElementProcessController):

@@ -3,7 +3,7 @@ from collections import Iterable
 import numpy as np
 
 from dbspy.core import base
-from dbspy.utils.indexing import index_nearest
+from dbspy.core.utils.indexing import index_nearest
 
 
 # define

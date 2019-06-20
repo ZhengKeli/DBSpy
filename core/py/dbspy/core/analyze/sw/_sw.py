@@ -2,9 +2,9 @@ import numpy as np
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
-from dbspy.utils.indexing import search_nearest, index_nearest
-from dbspy.utils.neighborhood import neighborhood
-from dbspy.utils.variance import add_var, sum_var, divide_var
+from dbspy.core.utils.indexing import search_nearest, index_nearest
+from dbspy.core.utils.neighborhood import neighborhood
+from dbspy.core.utils.variance import add_var, sum_var, divide_var
 
 
 # define

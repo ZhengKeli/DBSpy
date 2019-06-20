@@ -2,9 +2,9 @@ import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
 from dbspy.core import base
-from dbspy.utils.indexing import index_nearest
-from dbspy.utils.neighborhood import neighborhood
-from dbspy.utils.variance import spectrum_var
+from dbspy.core.utils.indexing import index_nearest
+from dbspy.core.utils.neighborhood import neighborhood
+from dbspy.core.utils.variance import spectrum_var
 
 
 # define

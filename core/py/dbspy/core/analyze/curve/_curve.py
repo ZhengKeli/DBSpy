@@ -2,7 +2,7 @@ import numpy as np
 
 from dbspy.core import base
 from dbspy.core.analyze import _analyze as analyze
-from dbspy.utils.variance import add_var, minus_var, divide_var, sum_var
+from dbspy.core.utils.variance import add_var, minus_var, divide_var, sum_var
 
 
 # define

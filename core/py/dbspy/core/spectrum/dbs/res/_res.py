@@ -2,8 +2,8 @@ import numpy as np
 
 from dbspy.core import base
 from dbspy.core.spectrum.dbs.peak import _peak as peak
-from dbspy.utils.gaussian import gaussian_fwhm, gaussian_fit
-from dbspy.utils.neighborhood import neighborhood
+from dbspy.core.utils.gaussian import gaussian_fwhm, gaussian_fit
+from dbspy.core.utils.neighborhood import neighborhood
 
 
 # define

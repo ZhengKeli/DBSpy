@@ -1,5 +1,5 @@
 from dbspy.core import base, spectrum, analyze
-from dbspy.utils.block import ClusterBlock
+from dbspy.core.utils.block import ClusterBlock
 
 
 class Conf(base.Conf):

@@ -1,10 +1,10 @@
 import numpy as np
 
 from dbspy.core import base
-from dbspy.utils.gaussian import gaussian_fwhm, gaussian_fit
-from dbspy.utils.indexing import index_nearest
-from dbspy.utils.neighborhood import neighborhood
-from dbspy.utils.variance import sum_var
+from dbspy.core.utils.gaussian import gaussian_fwhm, gaussian_fit
+from dbspy.core.utils.indexing import index_nearest
+from dbspy.core.utils.neighborhood import neighborhood
+from dbspy.core.utils.variance import sum_var
 
 
 # define

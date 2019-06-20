@@ -3,9 +3,9 @@ from scipy.ndimage import gaussian_filter
 
 from dbspy.core import base
 # define
-from dbspy.utils.indexing import index_nearest
-from dbspy.utils.neighborhood import neighborhood
-from dbspy.utils.variance import spectrum_var
+from dbspy.core.utils.indexing import index_nearest
+from dbspy.core.utils.neighborhood import neighborhood
+from dbspy.core.utils.variance import spectrum_var
 
 
 class Conf(base.ElementConf):
