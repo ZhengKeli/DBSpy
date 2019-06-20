@@ -15,7 +15,7 @@ class Controller(base.ProcessController):
         super().__init__(app.container, app.process.spectrum_processes[index])
     
     def on_create_info_frame(self, info_frame):
-        tk.Label(info_frame, text='DBS Spectrum').pack()
+        tk.Label(info_frame, text=f'#{self.index} DBS Spectrum').pack()
         
         tag_frame = tk.Frame(info_frame)
         tk.Label(tag_frame, text='tag=').pack(side='left')

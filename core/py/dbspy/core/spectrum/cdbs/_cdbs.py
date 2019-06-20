@@ -29,7 +29,7 @@ class Conf(spectrum.Conf):
 
 
 class Process(spectrum.Process):
-    def __init__(self, tag):
+    def __init__(self, tag=''):
         self.raw_process = raw.Process()
         self.peak_process = peak.Process(self.raw_process)
         self.sp_process = sp.Process(self.peak_process)

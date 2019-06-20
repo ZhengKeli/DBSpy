@@ -24,7 +24,7 @@ class Controller(FigureResultController, base.ElementProcessController):
             plt.figure(figsize=(7, 5)))
     
     def on_create_info_frame(self, info_frame):
-        tk.Label(info_frame, text='SW Analyze').pack()
+        tk.Label(info_frame, text=f'#{self.index} SW Analyze').pack()
         tk.Button(info_frame, text='Remove', foreground='red', command=self.remove).pack()
     
     def on_create_conf_frame(self, conf_frame):

@@ -146,22 +146,24 @@ class Application:
         for i, spectrum_process in enumerate(self.process.spectrum_processes):
             tag = str(spectrum_process.tag)
             if isinstance(spectrum_process, core.spectrum.dbs.Process):
-                spectrum_node = self.tree.insert(main_node, 'end', text='DBS Spectrum ' + tag, value=['spectrum', i])
+                spectrum_node = self.tree.insert(
+                    main_node, 'end', text=f'#{i} DBS Spectrum {tag}', value=['spectrum', i])
                 self.tree.insert(spectrum_node, 'end', text='raw', value=['spectrum', i, 'raw'])
                 self.tree.insert(spectrum_node, 'end', text='res', value=['spectrum', i, 'res'])
                 self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
                 self.tree.insert(spectrum_node, 'end', text='bg', value=['spectrum', i, 'bg'])
             elif isinstance(spectrum_process, core.spectrum.cdbs.Process):
-                spectrum_node = self.tree.insert(main_node, 'end', text='CDBS Spectrum ' + tag, value=['spectrum', i])
+                spectrum_node = self.tree.insert(
+                    main_node, 'end', text=f'#{i} CDBS Spectrum {tag}', value=['spectrum', i])
                 self.tree.insert(spectrum_node, 'end', text='raw', value=['spectrum', i, 'raw'])
                 self.tree.insert(spectrum_node, 'end', text='peak', value=['spectrum', i, 'peak'])
                 self.tree.insert(spectrum_node, 'end', text='sp', value=['spectrum', i, 'sp'])
         
         for i, analyze_process in enumerate(self.process.analyze_processes):
             if isinstance(analyze_process, core.analyze.sw.Process):
-                self.tree.insert(main_node, 'end', text='SW Analyze', value=['analyze', i])
+                self.tree.insert(main_node, 'end', text=f'#{i} SW Analyze', value=['analyze', i])
             elif isinstance(analyze_process, core.analyze.curve.Process):
-                self.tree.insert(main_node, 'end', text='Curve Analyze', value=['analyze', i])
+                self.tree.insert(main_node, 'end', text=f'#{i} Curve Analyze', value=['analyze', i])
     
     def tree_clicked(self, _):
         item = self.tree.item(self.tree.focus())
