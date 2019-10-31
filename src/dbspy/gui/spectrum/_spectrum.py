@@ -2,8 +2,8 @@ import tkinter as tk
 
 import matplotlib.pyplot as plt
 
-from dbspy import FigureController
-from dbspy import base
+from dbspy.gui.utils.figure import FigureController
+from dbspy.gui import base
 
 
 class Controller(base.ProcessController):

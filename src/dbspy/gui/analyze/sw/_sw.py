@@ -4,14 +4,14 @@ import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dbspy import Application
-from dbspy import FigureResultController
-from dbspy import base
+from dbspy.gui.utils.figure import FigureResultController
+from dbspy.gui import base
 from dbspy.core.analyze.sw import Conf
 
 
 class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
+        from dbspy.gui import Application
         self.app: Application = app
         self.index = index
         self.conf_rs = tk.StringVar()

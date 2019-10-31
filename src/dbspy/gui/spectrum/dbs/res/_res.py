@@ -3,9 +3,9 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dbspy import FigureResultController
-from dbspy import base
-from dbspy import dbs
+from dbspy.gui import base
+from dbspy.gui.spectrum import dbs
+from dbspy.gui.utils.figure import FigureResultController
 from dbspy.core.spectrum.dbs import Conf
 from dbspy.core.utils.neighborhood import neighborhood
 

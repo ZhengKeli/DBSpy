@@ -3,9 +3,9 @@ from collections import Iterable
 
 import matplotlib.pyplot as plt
 
-from dbspy import FigureResultController
-from dbspy import base
-from dbspy import dbs
+from dbspy.gui import base
+from dbspy.gui.spectrum import dbs
+from dbspy.gui.utils.figure import FigureResultController
 from dbspy.core.spectrum.dbs import Conf
 
 

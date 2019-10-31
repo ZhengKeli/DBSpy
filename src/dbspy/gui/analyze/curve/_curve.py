@@ -4,14 +4,14 @@ import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dbspy import Application
-from dbspy import FigureResultController
-from dbspy import base
+from dbspy.gui.utils.figure import FigureResultController
+from dbspy.gui import base
 from dbspy.core.analyze.curve import Conf
 
 
 class Controller(FigureResultController, base.ElementProcessController):
     def __init__(self, app, index):
+        from dbspy.gui import Application
         self.app: Application = app
         self.index = index
         self.tags = tuple(f"#{i} {process.tag}" for i, process in enumerate(app.process.spectrum_processes))

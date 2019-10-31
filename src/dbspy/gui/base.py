@@ -1,7 +1,7 @@
 import abc
 import tkinter as tk
 
-from dbspy import Process, ElementConf
+from dbspy.core.base import Process, ElementConf
 
 
 class WidgetController(abc.ABC):

@@ -2,9 +2,9 @@ import tkinter as tk
 
 import matplotlib.pyplot as plt
 
-from dbspy import FigureResultController
-from dbspy import base
-from dbspy.core.spectrum.dbs import Conf
+from dbspy.gui.utils.figure import FigureResultController
+from dbspy.gui import base
+from dbspy.core.spectrum.dbs.raw import Conf
 
 
 class Controller(FigureResultController, base.ElementProcessController):

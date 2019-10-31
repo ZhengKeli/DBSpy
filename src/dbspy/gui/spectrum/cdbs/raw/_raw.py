@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage as ndi
 
-from dbspy import Controller as DBSController
-from dbspy import FigureController
+from dbspy.gui.spectrum import Controller as DBSController
+from dbspy.gui.utils.figure import FigureController
 
 
 class Controller(DBSController):

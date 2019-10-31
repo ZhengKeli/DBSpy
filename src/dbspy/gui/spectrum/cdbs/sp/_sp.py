@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-from dbspy import FigureResultController
-from dbspy import base
+from dbspy.gui import base
+from dbspy.gui.utils.figure import FigureResultController
 from dbspy.core.spectrum.cdbs import Conf
 from dbspy.core.utils.neighborhood import neighborhood
 
