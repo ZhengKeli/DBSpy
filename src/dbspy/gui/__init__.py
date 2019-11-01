@@ -1,2 +1,2 @@
-from ._app import Application
+from .app import Application
 from . import spectrum, analyze

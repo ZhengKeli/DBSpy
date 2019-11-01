@@ -1,7 +1,6 @@
 import sys
 import tkinter as tk
-
-from dbspy.gui import Application
+from dbspy.gui.app import Application
 
 args = sys.argv
 app_path = args[0] if len(args) > 0 else None
