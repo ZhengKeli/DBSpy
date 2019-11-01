@@ -1,0 +1,7 @@
+# Nesserary to run DBSpy
+numpy
+scipy
+matplotlib
+
+# Nesserary to build .exe file
+pyinstaller
